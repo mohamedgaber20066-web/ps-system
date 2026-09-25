@@ -1,0 +1,2859 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>نادي البلايستيشن</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+  :root{
+    --blau:#004D98; --blau-2:#1279C6; --grana:#A50044; --grana-2:#E01361;
+    --gold:#FFC53D; --gold-2:#E8A100; --bg:#0A0D18; --surface:#12162A;
+    --surface-2:#191F3C; --surface-3:#232B54; --line:#2B3260;
+    --text:#F5F3EC; --text-dim:#98A0C2; --ok:#2FDB8A; --danger:#FF6673;
+    --r-lg:20px; --r-md:16px; --r-sm:11px;
+    --shadow-soft:0 10px 30px rgba(0,0,0,.28); --shadow-lift:0 16px 40px rgba(0,0,0,.4);
+    box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --bg:#F2EFE4; --surface:#FFFFFF; --surface-2:#F6F2E4; --surface-3:#ECE6D2;
+      --line:#DDD5BC; --text:#1B1C24; --text-dim:#63677E;
+      --shadow-soft:0 10px 30px rgba(30,20,0,.08); --shadow-lift:0 16px 40px rgba(30,20,0,.14);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0A0D18; --surface:#12162A; --surface-2:#191F3C; --surface-3:#232B54;
+    --line:#2B3260; --text:#F5F3EC; --text-dim:#98A0C2;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%; max-width:100%; overflow-x:hidden;}
+  body{margin:0; background:var(--bg); color:var(--text); font-family:'Cairo',system-ui,sans-serif; -webkit-font-smoothing:antialiased;}
+  body::before{content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:radial-gradient(1200px 560px at 88% -12%, rgba(0,77,152,.32), transparent 60%),
+      radial-gradient(950px 540px at 2% 112%, rgba(165,0,68,.26), transparent 60%);}
+  #app{position:relative; z-index:1; min-height:100%;}
+  .num{font-family:'Oswald',sans-serif; letter-spacing:.02em;}
+  a,button,input,select,textarea{font-family:inherit;}
+  button{cursor:pointer;}
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:99px;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001s !important; transition-duration:.001s !important;} }
+
+  .login-wrap{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:32px 18px;}
+  .login-card{width:100%; max-width:400px; background:linear-gradient(180deg,var(--surface-2),var(--surface));
+    border:1px solid var(--line); border-radius:var(--r-lg); padding:34px 28px 28px; text-align:center;
+    box-shadow:var(--shadow-lift); animation:riseIn .5s cubic-bezier(.2,.8,.2,1);}
+  @keyframes riseIn{from{opacity:0; transform:translateY(14px) scale(.98);} to{opacity:1; transform:none;}}
+  .brand-title{font-weight:900;font-size:29px;margin:6px 0 0;}
+  .brand-sub{color:var(--text-dim);font-size:13px;letter-spacing:.06em;margin-bottom:24px;}
+  .field{text-align:right;margin-bottom:14px;}
+  .field label{display:block;font-size:12px;color:var(--text-dim);margin-bottom:6px;}
+  .field input, .field select, .field textarea{width:100%; padding:12px 14px; border-radius:var(--r-sm);
+    border:1px solid var(--line); background:var(--surface); color:var(--text); font-size:15px; outline:none;
+    transition:border-color .15s ease, box-shadow .15s ease;}
+  .field input:focus, .field select:focus, .field textarea:focus{border-color:var(--blau-2); box-shadow:0 0 0 3px rgba(18,121,198,.18);}
+  .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; border:none;
+    border-radius:var(--r-sm); padding:12px 18px; font-weight:700; font-size:14px;
+    transition:transform .12s cubic-bezier(.2,.8,.2,1), filter .15s ease, box-shadow .15s ease, opacity .15s ease;}
+  .btn:active{transform:scale(.96);}
+  .btn-primary{background:linear-gradient(90deg,var(--blau),var(--blau-2)); color:#fff; width:100%; box-shadow:0 8px 20px rgba(18,121,198,.32);}
+  .btn-primary:hover{filter:brightness(1.08);}
+  .btn-grana{background:linear-gradient(90deg,var(--grana),var(--grana-2)); color:#fff; box-shadow:0 8px 20px rgba(224,19,97,.28);}
+  .btn-grana:hover{filter:brightness(1.08);}
+  .btn-ghost{background:var(--surface-2); border:1px solid var(--line); color:var(--text);}
+  .btn-ghost:hover{background:var(--surface-3);}
+  .btn-gold{background:linear-gradient(90deg,var(--gold),var(--gold-2)); color:#241800; box-shadow:0 8px 18px rgba(255,197,61,.25);}
+  .btn-sm{padding:9px 13px; font-size:13px; border-radius:10px;}
+  .btn-danger{background:rgba(255,102,115,.14); color:var(--danger); border:1px solid rgba(255,102,115,.35);}
+  .btn-danger:hover{background:rgba(255,102,115,.22);}
+  .btn:disabled{opacity:.4; cursor:not-allowed; box-shadow:none;}
+  .login-error{color:var(--danger); font-size:13px; margin:-6px 0 14px;}
+  .login-hint{margin-top:16px; font-size:11px; color:var(--text-dim);}
+
+  .shell{display:flex; min-height:100vh; width:100%; max-width:100vw; overflow-x:hidden;}
+  .sidebar{width:226px; flex:0 0 226px; background:var(--surface); border-left:1px solid var(--line);
+    display:flex; flex-direction:column; padding:22px 14px; position:sticky; top:0; align-self:flex-start; height:100vh;
+    transition:transform .25s cubic-bezier(.2,.8,.2,1);}
+  .side-logo{display:flex; align-items:center; gap:10px; padding:4px 6px 20px; border-bottom:1px solid var(--line); margin-bottom:16px;}
+  .side-logo svg{width:40px;height:40px;flex:none;}
+  .side-logo .t1{font-weight:900; font-size:16px;}
+  .side-logo .t2{font-size:10px; color:var(--text-dim);}
+  .nav-item{display:flex; align-items:center; gap:10px; padding:11px 12px; border-radius:12px;
+    color:var(--text-dim); font-weight:700; font-size:14px; margin-bottom:4px; border:1px solid transparent;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;}
+  .nav-item:hover{background:var(--surface-2); color:var(--text);}
+  .nav-item .ic{width:18px;text-align:center;}
+  .nav-item.active{background:var(--surface-2); color:var(--text); border-color:var(--line);}
+  .nav-item.active::after{content:"";width:6px;height:6px;border-radius:99px;background:var(--gold);margin-right:auto;}
+  .side-foot{margin-top:auto; padding-top:14px; border-top:1px solid var(--line);}
+  .who{font-size:12px; color:var(--text-dim); margin-bottom:8px;}
+  .who b{color:var(--text);}
+  .main{flex:1; min-width:0; max-width:100%; overflow-x:hidden; padding:26px 28px 60px;}
+  .topbar{display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; gap:12px; flex-wrap:wrap;}
+  .page-title{font-weight:900; font-size:22px; margin:0;}
+  .page-sub{color:var(--text-dim); font-size:13px; margin-top:3px;}
+  .mobile-topbar{display:none;}
+  @media (max-width:860px){
+    .sidebar{position:fixed; z-index:40; top:0; right:0; bottom:0; left:auto; height:100%; width:78%;
+      max-width:280px; min-width:0; transform:translateX(100%); flex-basis:auto;}
+    .sidebar.open{transform:translateX(0);}
+    .main{padding:16px 14px 60px;}
+    .mobile-topbar{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;
+      padding-top:env(safe-area-inset-top,0px);}
+    .burger{background:var(--surface-2); border:1px solid var(--line); color:var(--text); border-radius:10px; padding:9px 12px;}
+    .scrim{display:none;}
+    .scrim.show{display:block; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:35; animation:fadeIn .18s ease;}
+  }
+  @media (min-width:861px) and (max-width:1100px){
+    .sidebar{width:196px; flex-basis:196px;}
+    .main{padding:22px 20px 60px;}
+  }
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+  .grid{display:grid; gap:14px; grid-template-columns:repeat(auto-fill,minmax(230px,1fr));}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-md);
+    padding:17px; position:relative; overflow:hidden; box-shadow:var(--shadow-soft); min-width:0;}
+  .device-card{cursor:pointer; transition:transform .16s cubic-bezier(.2,.8,.2,1), border-color .16s ease, box-shadow .16s ease;}
+  .device-card:hover{transform:translateY(-3px); border-color:var(--blau-2); box-shadow:var(--shadow-lift);}
+  .device-card.active{border-color:var(--grana-2); background:linear-gradient(160deg, rgba(165,0,68,.22), var(--surface) 62%);}
+  .dev-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;}
+  .dev-name{font-weight:800; font-size:16px;}
+  .dev-type{font-size:11px; color:var(--text-dim); background:var(--surface-3); padding:4px 10px; border-radius:99px;}
+  .status-dot{width:8px;height:8px;border-radius:99px;display:inline-block;margin-left:6px;}
+  .status-dot.idle{background:var(--ok);}
+  .status-dot.active{background:var(--grana-2); box-shadow:0 0 0 4px rgba(165,0,68,.25); animation:pulse 1.5s infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(165,0,68,.4);}70%{box-shadow:0 0 0 9px rgba(165,0,68,0);}100%{box-shadow:0 0 0 0 rgba(165,0,68,0);}}
+  .dev-status-label{font-size:12px; color:var(--text-dim); margin-bottom:12px;}
+  .dev-timer{font-family:'Oswald',sans-serif; font-size:27px; font-weight:600; margin-bottom:4px;}
+  .dev-cost{font-size:13px; color:var(--gold); font-weight:700; margin-bottom:12px;}
+  .dev-rates{font-size:11.5px; color:var(--text-dim); margin-bottom:12px; line-height:1.9; overflow-wrap:anywhere;}
+  .dev-rates span{color:var(--text); font-weight:700;}
+  .dev-mode-tag{font-size:11px; color:var(--text-dim); margin-bottom:10px;}
+  .dev-mode-tag b{color:var(--gold);}
+
+  .section-head{display:flex; align-items:center; justify-content:space-between; margin:28px 0 12px;}
+  .section-head h3{margin:0; font-size:15px; font-weight:800;}
+  .list-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-md); overflow:hidden; box-shadow:var(--shadow-soft);}
+  .row-item{display:flex; align-items:center; gap:12px; padding:14px 16px; border-bottom:1px solid var(--line); transition:background .15s ease;}
+  .row-item:hover{background:var(--surface-2);}
+  .row-item:last-child{border-bottom:none;}
+  .row-avatar{width:40px;height:40px;border-radius:12px;background:var(--surface-3);display:flex;align-items:center;justify-content:center;font-weight:800;flex:none;overflow:hidden;}
+  .row-avatar img{width:100%;height:100%;object-fit:cover;}
+  .row-main{flex:1; min-width:0; overflow-wrap:anywhere;}
+  .row-title{font-weight:700; font-size:14px;}
+  .row-sub{font-size:12px; color:var(--text-dim);}
+  .row-actions{display:flex; gap:6px; align-items:center; flex-wrap:wrap;}
+  .rate-input{width:62px; padding:7px 8px; border-radius:9px; border:1px solid var(--line);
+    background:var(--surface-2); color:var(--text); font-size:13px; text-align:center;}
+  .stock-badge{font-size:11px; padding:4px 9px; border-radius:99px; background:var(--surface-3); color:var(--text-dim);}
+  .stock-badge.low{color:var(--danger); background:rgba(255,102,115,.14);}
+  .empty-state{padding:38px 16px; text-align:center; color:var(--text-dim); font-size:13px;}
+  .form-card{background:var(--surface); border:1px dashed var(--line); border-radius:var(--r-md); padding:17px; margin-top:14px; min-width:0;}
+  .form-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:11px; margin-bottom:12px;}
+  .form-grid .field{margin-bottom:0;}
+
+  .mode-choice{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:10px 0 16px;}
+  .mode-chip{border:1px solid var(--line); background:var(--surface-2); border-radius:12px; padding:11px 8px; text-align:center; transition:all .15s ease;}
+  .mode-chip .lbl{font-size:12.5px; font-weight:700; display:block;}
+  .mode-chip .pr{font-size:11px; color:var(--text-dim); display:block; margin-top:3px;}
+  .mode-chip.sel{border-color:var(--gold); background:rgba(255,197,61,.12); box-shadow:0 0 0 1px var(--gold) inset;}
+
+  .modal-scrim{position:fixed; inset:0; background:rgba(4,6,14,.66); backdrop-filter:blur(5px);
+    -webkit-backdrop-filter:blur(5px); z-index:60; display:flex; align-items:flex-end; justify-content:center; animation:fadeIn .18s ease;}
+  @media (min-width:700px){.modal-scrim{align-items:center;}}
+  .modal{width:100%; max-width:580px; max-height:92vh; overflow-y:auto; background:var(--surface);
+    border:1px solid var(--line); border-radius:22px 22px 0 0; padding:24px 22px calc(22px + env(safe-area-inset-bottom,0px));
+    box-shadow:var(--shadow-lift); animation:sheetUp .28s cubic-bezier(.2,.8,.2,1);}
+  @keyframes sheetUp{from{opacity:0; transform:translateY(26px);}to{opacity:1; transform:none;}}
+  @media (min-width:700px){.modal{border-radius:20px; animation:popIn .22s cubic-bezier(.2,.8,.2,1);}}
+  @keyframes popIn{from{opacity:0; transform:translateY(10px) scale(.97);}to{opacity:1; transform:none;}}
+  .modal-head{display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:16px;}
+  .modal-title{font-weight:900; font-size:18px; margin:0;}
+  .modal-title small{display:block; font-weight:600; font-size:12px; color:var(--text-dim); margin-top:3px;}
+  .modal-close{background:var(--surface-2); border:1px solid var(--line); color:var(--text);
+    width:33px;height:33px;border-radius:99px;font-size:16px;line-height:1;}
+  .kv-row{display:flex; justify-content:space-between; align-items:center; padding:9px 0;
+    border-bottom:1px solid var(--line); font-size:13px; gap:10px;}
+  .kv-row .k{flex:0 0 auto; color:var(--text-dim);}
+  .kv-row .v{min-width:0; overflow-wrap:anywhere; text-align:left; font-weight:700;}
+  .kv-row:last-child{border-bottom:none;}
+  .drink-line{display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--line); font-size:13px;}
+  .drink-line:last-child{border-bottom:none;}
+  .drink-pick{display:flex; align-items:center; gap:10px; padding:11px; border:1px solid var(--line);
+    border-radius:12px; margin-bottom:8px; transition:border-color .15s ease;}
+  .drink-pick:hover{border-color:var(--blau-2);}
+  .drink-pick img{width:38px;height:38px;border-radius:99px;object-fit:cover;background:var(--surface-3);}
+  .qty-ctl{display:flex; align-items:center; gap:8px;}
+  .qty-ctl button{width:28px;height:28px;border-radius:9px;border:1px solid var(--line);
+    background:var(--surface-2);color:var(--text);font-weight:800;}
+  .qty-ctl button:hover{background:var(--surface-3);}
+  .total-strip{display:flex; justify-content:space-between; align-items:center; background:var(--surface-2);
+    border-radius:12px; padding:13px 15px; margin:14px 0; font-weight:800;}
+  .total-strip .amt{color:var(--gold); font-family:'Oswald',sans-serif; font-size:19px;}
+
+  .shift-hero{background:linear-gradient(150deg, rgba(0,77,152,.28), var(--surface) 55%);
+    border:1px solid var(--line); border-radius:var(--r-lg); padding:24px; margin-bottom:20px; box-shadow:var(--shadow-soft);}
+  .shift-hero.closed{background:var(--surface);}
+  .shift-stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin-top:16px;}
+  .stat-box{background:var(--surface-2); border:1px solid var(--line); border-radius:13px; padding:13px; min-width:0;}
+  .stat-box .lbl{font-size:11px; color:var(--text-dim); margin-bottom:6px;}
+  .stat-box .val{font-family:'Oswald',sans-serif; font-size:19px; font-weight:600;}
+  .stat-box.pos .val{color:var(--ok);}
+  .stat-box.neg .val{color:var(--danger);}
+  .stat-box.net .val{color:var(--gold); font-size:21px;}
+  .exp-line{display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--line); font-size:13px;}
+  .exp-line:last-child{border-bottom:none;}
+
+  .receipt{background:#fff; color:#111; border-radius:14px; padding:20px; font-size:13px;}
+  .receipt-head{text-align:center; margin-bottom:14px;}
+  .receipt-head svg{width:64px;height:64px;margin:0 auto 6px; filter:none; display:block;}
+  .receipt-head h2{margin:0; font-size:18px;}
+  .receipt-head p{margin:2px 0 0; font-size:11px; color:#555;}
+  .receipt hr{border:none; border-top:1px dashed #bbb; margin:12px 0;}
+  .receipt table{width:100%; border-collapse:collapse; font-size:12px;}
+  .receipt th, .receipt td{text-align:right; padding:5px 0;}
+  .receipt .r-row{display:flex; justify-content:space-between; font-size:12px; padding:2px 0;}
+
+  .table-wrap{overflow-x:auto;}
+  table.plain{width:100%; border-collapse:collapse; font-size:13px; min-width:560px;}
+  table.plain th{text-align:right; color:var(--text-dim); font-weight:700; font-size:11px; padding:9px 10px; border-bottom:1px solid var(--line);}
+  table.plain td{padding:11px 10px; border-bottom:1px solid var(--line);}
+  table.plain tr:last-child td{border-bottom:none;}
+  .link-row{cursor:pointer; transition:background .15s ease;}
+  .link-row:hover{background:var(--surface-2);}
+  .badge-role{font-size:10px; padding:2px 8px; border-radius:99px; background:var(--surface-3); color:var(--text-dim);}
+  .badge-role.admin{background:rgba(255,197,61,.16); color:var(--gold);}
+  .theme-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(64px,1fr)); gap:10px; margin-bottom:16px;}
+  .theme-swatch{display:flex; gap:3px; padding:8px; border-radius:12px; border:2px solid var(--line); cursor:pointer; height:36px; align-items:center; justify-content:center;}
+  .theme-swatch.sel{box-shadow:0 0 0 2px var(--gold); border-color:var(--gold);}
+  .theme-swatch span{display:block; width:9px; height:22px; border-radius:4px;}
+  .badge-status{font-size:10px; padding:2px 9px; border-radius:99px;}
+  .badge-status.open{background:rgba(47,219,138,.16); color:var(--ok);}
+  .tabs2{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;}
+  .tab2{padding:8px 14px; border-radius:10px; font-size:13px; font-weight:700; color:var(--text-dim);
+    background:var(--surface); border:1px solid var(--line); cursor:pointer;}
+  .tab2.active{background:var(--surface-2); color:var(--text); border-color:var(--gold);}
+
+  .price-grid{display:grid; grid-template-columns:auto 1fr 1fr 1fr; gap:6px 8px; align-items:center; font-size:12px;}
+  .price-grid .h{font-size:10.5px; color:var(--text-dim); text-align:center; font-weight:700;}
+  .price-grid .lbl{font-size:11.5px; color:var(--text-dim); white-space:nowrap;}
+  .busy-overlay{position:fixed; inset:0; z-index:100; background:rgba(4,6,14,.45); display:flex; align-items:center; justify-content:center;}
+  .busy-box{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:20px 26px; font-weight:800; box-shadow:var(--shadow-lift);}
+  .app-footer{text-align:center; padding:30px 10px 8px; color:var(--text-dim); font-size:11px; letter-spacing:.05em;}
+  .app-footer b{color:var(--gold); font-weight:800;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ============================================================
+   برشلونة — نادي البلايستيشن (إصدار 5)
+   - حساب الأدمن admin/admin123 مخفي ومحمي من الحذف
+   - الأدمن يعدل يوزر/باسورد أي موظف والتعديل بيتطبق على كل الفروع
+   - زرار "تغيير باسوردي" في القائمة الجانبية
+   - الموظف لا يستطيع إلغاء أي جلسة إطلاقًا (أدمن فقط)
+   - حذف/تصحيح البيع المباشر مع إرجاع المخزون (أدمن)
+   - فلترة السجل بالتاريخ + تصدير CSV
+   - خصم يدوي عند إغلاق الجلسة (أدمن)
+   - تنبيه مخزون منخفض
+   ============================================================ */
+
+let db = null;
+
+/* ============================================================
+   طبقة الاتصال بـ Supabase (بدل window.claude.use('db'))
+   ------------------------------------------------------------
+   حطّ بيانات مشروعك من Supabase Dashboard > Project Settings > API
+   لازم كمان تشغّل SQL setup اللي في آخر الملف (تعليق SUPABASE SETUP)
+   جوه SQL editor بتاع مشروعك قبل ما تشغّل التطبيق.
+   ============================================================ */
+const SUPABASE_URL = 'https://lxgqgwyomdatntemftyv.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_iviICZ8Ql4J3K-FT76L8yA_AtHwyFyf';
+
+/* ---- شيم بيحاكي شكل Firestore (collection/doc/where/onSnapshot...)
+   فوق جدول واحد في Postgres، عشان أكواد التطبيق كلها (dbCol/dbDoc
+   وكل استخدامات .get/.set/.update/.delete/.where/.onSnapshot) تفضل
+   شغالة زي ما هي من غير ما نلمسها. ---- */
+function withTimeout(promise, ms){
+  ms = ms || 15000;
+  return Promise.race([
+    promise,
+    new Promise((_, reject)=> setTimeout(()=> reject(new Error('انتهت مهلة الاتصال بقاعدة البيانات — تأكد إن مشروع Supabase شغال (مش Paused) وإن النت متصل')), ms)),
+  ]);
+}
+function makeSupabaseFirestoreShim(client){
+  const TABLE = 'documents';
+  function docSnap(row, id){
+    return { id, exists: !!row, data: () => row ? {...row.data} : undefined };
+  }
+  function applyLocalFilters(rows, filters, orderSpec, limitN){
+    let out = rows;
+    filters.forEach(f=>{
+      out = out.filter(r=>{
+        const v = r.data ? r.data[f.field] : undefined;
+        if(f.op === '==') return v === f.value;
+        if(f.op === '<')  return v !== undefined && v < f.value;
+        if(f.op === '<=') return v !== undefined && v <= f.value;
+        if(f.op === '>')  return v !== undefined && v > f.value;
+        if(f.op === '>=') return v !== undefined && v >= f.value;
+        return true;
+      });
+    });
+    if(orderSpec){
+      const {field, dir} = orderSpec;
+      out = [...out].sort((a,b)=>{
+        const av = a.data?.[field], bv = b.data?.[field];
+        if(av === bv) return 0;
+        const cmp = av > bv ? 1 : -1;
+        return dir === 'desc' ? -cmp : cmp;
+      });
+    }
+    if(limitN != null) out = out.slice(0, limitN);
+    return out;
+  }
+  function makeCollectionRef(path, filters, orderSpec, limitN){
+    filters = filters || []; orderSpec = orderSpec || null; limitN = (limitN == null ? null : limitN);
+    const genId = ()=> self.crypto?.randomUUID ? crypto.randomUUID() : 'id-'+Date.now()+'-'+Math.random().toString(16).slice(2);
+    const ref = {
+      doc(id){ return makeDocRef(path + '/' + (id || genId())); },
+      where(field, op, value){ return makeCollectionRef(path, [...filters, {field, op, value}], orderSpec, limitN); },
+      orderBy(field, dir){ return makeCollectionRef(path, filters, {field, dir: dir||'asc'}, limitN); },
+      limit(n){ return makeCollectionRef(path, filters, orderSpec, n); },
+      async add(data){
+        const id = genId();
+        const { error } = await withTimeout(client.from(TABLE).insert({ collection_path: path, id, data }));
+        if(error) throw error;
+        return makeDocRef(path + '/' + id);
+      },
+      async get(){
+        const { data: rows, error } = await withTimeout(client.from(TABLE).select('id,data').eq('collection_path', path));
+        if(error) throw error;
+        const mapped = rows.map(r=>({ id:r.id, data:r.data }));
+        const finalRows = applyLocalFilters(mapped, filters, orderSpec, limitN);
+        return { docs: finalRows.map(r=>docSnap(r.data, r.id)), empty: finalRows.length===0 };
+      },
+      onSnapshot(onNext, onError){
+        let stopped = false;
+        const refetch = async ()=>{
+          try{ const snap = await ref.get(); if(!stopped) onNext(snap); }
+          catch(e){ if(!stopped && onError) onError(e); }
+        };
+        refetch();
+        const channel = client.channel('col:'+path+':'+Math.random())
+          .on('postgres_changes', { event:'*', schema:'public', table:TABLE, filter:`collection_path=eq.${path}` }, refetch)
+          .subscribe();
+        return ()=>{ stopped = true; client.removeChannel(channel); };
+      },
+    };
+    return ref;
+  }
+  function makeDocRef(fullPath){
+    const idx = fullPath.lastIndexOf('/');
+    const path = fullPath.slice(0, idx);
+    const id = fullPath.slice(idx+1);
+    return {
+      id, path: fullPath,
+      async get(){
+        const { data: row, error } = await withTimeout(client.from(TABLE).select('data').eq('collection_path', path).eq('id', id).maybeSingle());
+        if(error) throw error;
+        return docSnap(row ? row.data : null, id);
+      },
+      async set(data){
+        const { error } = await withTimeout(client.from(TABLE).upsert({ collection_path: path, id, data }));
+        if(error) throw error;
+      },
+      async update(partial){
+        const { data: row, error: e1 } = await withTimeout(client.from(TABLE).select('data').eq('collection_path', path).eq('id', id).maybeSingle());
+        if(e1) throw e1;
+        const merged = { ...(row ? row.data : {}), ...partial };
+        const { error } = await withTimeout(client.from(TABLE).upsert({ collection_path: path, id, data: merged }));
+        if(error) throw error;
+      },
+      async delete(){
+        const { error } = await withTimeout(client.from(TABLE).delete().eq('collection_path', path).eq('id', id));
+        if(error) throw error;
+      },
+      onSnapshot(onNext, onError){
+        let stopped = false;
+        const refetch = async ()=>{
+          try{ const snap = await this.get(); if(!stopped) onNext(snap); }
+          catch(e){ if(!stopped && onError) onError(e); }
+        };
+        refetch();
+        const channel = client.channel('doc:'+fullPath+':'+Math.random())
+          .on('postgres_changes', { event:'*', schema:'public', table:TABLE, filter:`collection_path=eq.${path}` }, (payload)=>{
+            if(payload.new?.id === id || payload.old?.id === id) refetch();
+          }).subscribe();
+        return ()=>{ stopped = true; client.removeChannel(channel); };
+      },
+    };
+  }
+  return {
+    collection: (path)=> makeCollectionRef(path),
+    doc: (path)=> makeDocRef(path),
+    // ملاحظة: مفيش runTransaction هنا عمدًا — الكود عنده fallback جاهز
+    // في دالة runTx() بيعمل get/set/update/delete بالتتابع من غير Firestore.
+  };
+}
+let bootError = null;
+let shopUnsubs = [];
+let sessionsUnsubs = [];
+let usersSub = null;
+let renderQueued = false;
+let rendering = false;
+const LS_KEY = 'barca_ps_current_user';
+const LS_SHOP_KEY = 'barca_ps_shop';
+const MODE_LABEL = { solo:'عادي', multi:'مالتي', triple:'تلت دراعات' };
+const KINDS = ['PS4','PS5'];
+const MODES = ['solo','multi','triple'];
+const CLOSED_SESSIONS_LIMIT = 2000;
+const OLDER_SESSIONS_CHUNK = 200;
+const LOW_STOCK_THRESHOLD = 5;
+
+const DEFAULT_PRICES = {
+  PS4: { solo:{q:5,h:10,hr:20}, multi:{q:8,h:15,hr:30}, triple:{q:10,h:18,hr:35} },
+  PS5: { solo:{q:8,h:15,hr:30}, multi:{q:10,h:18,hr:35}, triple:{q:12,h:22,hr:40} }
+};
+
+/* ============================================================
+   40 ثيم — كلهم داكن/ستايل جيمنج. كل ثيم بيغيّر متغيرات CSS
+   بتاعة الألوان بس (blau/grana/gold + الخلفيات)، من غير ما نلمس
+   أي CSS تاني في الملف، لأن كل الشاشات أصلاً بتستخدم var(--...).
+   ============================================================ */
+const THEMES = [
+  {key:'blackPurple', name:'أسود × بنفسجي', blau:'#7C3AED', blau2:'#5B21B6', grana:'#A855F7', grana2:'#7E22CE', gold:'#C084FC', gold2:'#9333EA', bg:'#0A0612', surface:'#150E24', surface2:'#1D1330', surface3:'#271A42', line:'#3B2A5C'},
+  {key:'purpleNeon', name:'بنفسجي نيون', blau:'#B026FF', blau2:'#7B1FA2', grana:'#E040FB', grana2:'#AA00FF', gold:'#EA80FC', gold2:'#D500F9', bg:'#0D0417', surface:'#180a28', surface2:'#220f38', surface3:'#2e1548', line:'#4a1f6e'},
+  {key:'cyberCyan', name:'سايبر سيان', blau:'#00E5FF', blau2:'#00B8D4', grana:'#18FFFF', grana2:'#00E5FF', gold:'#84FFFF', gold2:'#00E5FF', bg:'#001014', surface:'#001e26', surface2:'#012c38', surface3:'#013b4a', line:'#02576e'},
+  {key:'electricBlue', name:'أزرق كهربائي', blau:'#2979FF', blau2:'#2962FF', grana:'#448AFF', grana2:'#2979FF', gold:'#82B1FF', gold2:'#448AFF', bg:'#050a17', surface:'#0c1530', surface2:'#132048', surface3:'#1a2c60', line:'#28407e'},
+  {key:'neonGreen', name:'أخضر نيون', blau:'#00E676', blau2:'#00C853', grana:'#69F0AE', grana2:'#00E676', gold:'#B9F6CA', gold2:'#00E676', bg:'#03130a', surface:'#062012', surface2:'#0a2e1b', surface3:'#0f3c25', line:'#1a5c39'},
+  {key:'limeGamer', name:'ليموني جيمر', blau:'#C6FF00', blau2:'#AEEA00', grana:'#EEFF41', grana2:'#C6FF00', gold:'#F4FF81', gold2:'#C6FF00', bg:'#0a0d02', surface:'#141a04', surface2:'#1e2607', surface3:'#28330a', line:'#3d4d0f'},
+  {key:'blazeOrange', name:'برتقالي ناري', blau:'#FF6D00', blau2:'#E65100', grana:'#FF9100', grana2:'#FF6D00', gold:'#FFD180', gold2:'#FF9100', bg:'#170800', surface:'#251100', surface2:'#331900', surface3:'#412300', line:'#5e3600'},
+  {key:'crimsonRed', name:'أحمر قرمزي', blau:'#FF1744', blau2:'#D50000', grana:'#FF5252', grana2:'#FF1744', gold:'#FF8A80', gold2:'#FF5252', bg:'#170003', surface:'#260006', surface2:'#35000a', surface3:'#45000d', line:'#650014'},
+  {key:'goldRoyal', name:'ذهبي ملكي', blau:'#FFC400', blau2:'#FFAB00', grana:'#FFD740', grana2:'#FFC400', gold:'#FFE57F', gold2:'#FFD740', bg:'#120d00', surface:'#1e1600', surface2:'#2b2000', surface3:'#382a00', line:'#544000'},
+  {key:'silverSteel', name:'فضي ستيل', blau:'#B0BEC5', blau2:'#90A4AE', grana:'#CFD8DC', grana2:'#B0BEC5', gold:'#ECEFF1', gold2:'#CFD8DC', bg:'#0d1012', surface:'#171b1e', surface2:'#20262a', surface3:'#2a3236', line:'#3d474c'},
+  {key:'barcaClassic', name:'أزرق × عنابي', blau:'#004D98', blau2:'#1279C6', grana:'#A50044', grana2:'#E01361', gold:'#FFC53D', gold2:'#E8A100', bg:'#0A0D18', surface:'#12162A', surface2:'#191F3C', surface3:'#232B54', line:'#2B3260'},
+  {key:'madridWhite', name:'أبيض ملكي', blau:'#FEBE10', blau2:'#00529F', grana:'#00529F', grana2:'#FEBE10', gold:'#FEBE10', gold2:'#e0a800', bg:'#0a0c10', surface:'#141821', surface2:'#1d232f', surface3:'#272e3d', line:'#3a4356'},
+  {key:'liverpoolRed', name:'أحمر ليفربول', blau:'#C8102E', blau2:'#8C0A20', grana:'#E31937', grana2:'#C8102E', gold:'#F6EB61', gold2:'#F6EB61', bg:'#0e0203', surface:'#1c0507', surface2:'#2a070a', surface3:'#380a0e', line:'#5c1219'},
+  {key:'chelseaBlue', name:'أزرق تشيلسي', blau:'#034694', blau2:'#022a5c', grana:'#6CABDD', grana2:'#034694', gold:'#DBA111', gold2:'#b98a0d', bg:'#020712', surface:'#050f22', surface2:'#081733', surface3:'#0b1f44', line:'#12315f'},
+  {key:'arsenalRed', name:'أحمر أرسنال', blau:'#EF0107', blau2:'#9C824A', grana:'#DB0007', grana2:'#EF0107', gold:'#9C824A', gold2:'#7d6a3c', bg:'#0f0202', surface:'#1e0404', surface2:'#2c0606', surface3:'#3b0808', line:'#5c0d0d'},
+  {key:'psBlue', name:'بلايستيشن أزرق', blau:'#0070D1', blau2:'#003791', grana:'#00A0E9', grana2:'#0070D1', gold:'#FFFFFF', gold2:'#c9d6e3', bg:'#01050f', surface:'#020b1e', surface2:'#03122d', surface3:'#04193d', line:'#0a2c5c'},
+  {key:'xboxGreen', name:'إكس بوكس جرين', blau:'#107C10', blau2:'#0b5a0b', grana:'#4CAF50', grana2:'#107C10', gold:'#9CCC65', gold2:'#7cb342', bg:'#020e02', surface:'#041a04', surface2:'#072607', surface3:'#0a330a', line:'#124f12'},
+  {key:'nintendoRed', name:'نينتندو ريد', blau:'#E60012', blau2:'#a5000d', grana:'#FF4757', grana2:'#E60012', gold:'#FFD24C', gold2:'#e6ba33', bg:'#100202', surface:'#1e0404', surface2:'#2c0606', surface3:'#3b0808', line:'#5c0d0d'},
+  {key:'discordBlurple', name:'ديسكورد بلربل', blau:'#5865F2', blau2:'#4752C4', grana:'#7289DA', grana2:'#5865F2', gold:'#EB459E', gold2:'#c53880', bg:'#06070f', surface:'#0e0f1d', surface2:'#161829', surface3:'#1e2136', line:'#2f3350'},
+  {key:'twitchPurple', name:'تويتش بربل', blau:'#9146FF', blau2:'#6441A5', grana:'#BF94FF', grana2:'#9146FF', gold:'#E0AAFF', gold2:'#BF94FF', bg:'#0b0614', surface:'#150c25', surface2:'#1f1236', surface3:'#291848', line:'#3f2569'},
+  {key:'razerGreen', name:'ريزر جرين', blau:'#44D62C', blau2:'#2e9c1c', grana:'#8AFF6B', grana2:'#44D62C', gold:'#C6FFB3', gold2:'#8AFF6B', bg:'#020c01', surface:'#041a03', surface2:'#072705', surface3:'#0a3407', line:'#144f10'},
+  {key:'sunsetPink', name:'وردي غروب', blau:'#FF4D8D', blau2:'#D6336C', grana:'#FF85B3', grana2:'#FF4D8D', gold:'#FFC1DA', gold2:'#FF85B3', bg:'#140107', surface:'#22030d', surface2:'#310513', surface3:'#40071a', line:'#630f2a'},
+  {key:'hotPink', name:'فوشيا نار', blau:'#FF006E', blau2:'#C40058', grana:'#FF4D9D', grana2:'#FF006E', gold:'#FF8FC2', gold2:'#FF4D9D', bg:'#140006', surface:'#22000b', surface2:'#310010', surface3:'#400016', line:'#630025'},
+  {key:'deepIndigo', name:'نيلي غامق', blau:'#3D5AFE', blau2:'#304FFE', grana:'#536DFE', grana2:'#3D5AFE', gold:'#8C9EFF', gold2:'#536DFE', bg:'#04051a', surface:'#080a2e', surface2:'#0c1042', surface3:'#101656', line:'#1c2382'},
+  {key:'tealWave', name:'تركواز موجة', blau:'#00BFA5', blau2:'#00897B', grana:'#1DE9B6', grana2:'#00BFA5', gold:'#A7FFEB', gold2:'#1DE9B6', bg:'#00100d', surface:'#001e18', surface2:'#002c23', surface3:'#003a2e', line:'#005c49'},
+  {key:'copperBronze', name:'نحاسي', blau:'#B87333', blau2:'#8a5626', grana:'#D9995B', grana2:'#B87333', gold:'#F0C48A', gold2:'#D9995B', bg:'#120a04', surface:'#1e1408', surface2:'#2b1e0c', surface3:'#382810', line:'#573f19'},
+  {key:'roseGold', name:'روز جولد', blau:'#E8A0A0', blau2:'#C97C7C', grana:'#F2B8B5', grana2:'#E8A0A0', gold:'#FADCD9', gold2:'#F2B8B5', bg:'#140b0b', surface:'#221515', surface2:'#301e1e', surface3:'#3e2727', line:'#5f3a3a'},
+  {key:'midnightBlue', name:'أزرق منتصف الليل', blau:'#1A237E', blau2:'#0d1657', grana:'#3949AB', grana2:'#1A237E', gold:'#7986CB', gold2:'#3949AB', bg:'#020412', surface:'#050920', surface2:'#080e30', surface3:'#0c1440', line:'#151f66'},
+  {key:'plasmaPink', name:'بلازما', blau:'#D500F9', blau2:'#AA00FF', grana:'#FF4081', grana2:'#D500F9', gold:'#FF80AB', gold2:'#FF4081', bg:'#100019', surface:'#1c002c', surface2:'#28003f', surface3:'#340052', line:'#520080'},
+  {key:'lavaRed', name:'حمم بركانية', blau:'#BF360C', blau2:'#8f2809', grana:'#FF5722', grana2:'#BF360C', gold:'#FFAB91', gold2:'#FF5722', bg:'#140400', surface:'#220800', surface2:'#300d00', surface3:'#3e1100', line:'#611b00'},
+  {key:'oceanDeep', name:'أعماق المحيط', blau:'#01579B', blau2:'#013a68', grana:'#0288D1', grana2:'#01579B', gold:'#4FC3F7', gold2:'#0288D1', bg:'#00060d', surface:'#000f1c', surface2:'#00182b', surface3:'#01213a', line:'#02375c'},
+  {key:'forestNight', name:'غابة ليلية', blau:'#1B5E20', blau2:'#0d3a10', grana:'#2E7D32', grana2:'#1B5E20', gold:'#81C784', gold2:'#2E7D32', bg:'#020a02', surface:'#051205', surface2:'#081a08', surface3:'#0b220b', line:'#153a15'},
+  {key:'grapeSoda', name:'عنبي', blau:'#6A1B9A', blau2:'#4a1170', grana:'#8E24AA', grana2:'#6A1B9A', gold:'#CE93D8', gold2:'#8E24AA', bg:'#0c0212', surface:'#160420', surface2:'#20062e', surface3:'#2a083c', line:'#440e60'},
+  {key:'skyGamer', name:'سماوي جيمر', blau:'#00B0FF', blau2:'#0091EA', grana:'#40C4FF', grana2:'#00B0FF', gold:'#80D8FF', gold2:'#40C4FF', bg:'#01080f', surface:'#03121e', surface2:'#051c2d', surface3:'#07263c', line:'#0d3f60'},
+  {key:'mintFresh', name:'نعناعي', blau:'#00E676', blau2:'#00BFA5', grana:'#64FFDA', grana2:'#00E676', gold:'#A7FFEB', gold2:'#64FFDA', bg:'#020e0a', surface:'#041c15', surface2:'#062a1f', surface3:'#08382a', line:'#0e5a44'},
+  {key:'blackGold', name:'أسود × ذهبي', blau:'#B8860B', blau2:'#8a6408', grana:'#DAA520', grana2:'#B8860B', gold:'#FFD700', gold2:'#DAA520', bg:'#08070a', surface:'#131015', surface2:'#1e1a20', surface3:'#29232b', line:'#413a44'},
+  {key:'blackRed', name:'أسود × أحمر', blau:'#8B0000', blau2:'#5c0000', grana:'#DC143C', grana2:'#8B0000', gold:'#FF6B6B', gold2:'#DC143C', bg:'#080304', surface:'#150607', surface2:'#22090b', surface3:'#2f0c0f', line:'#4d1417'},
+  {key:'blackTeal', name:'أسود × تركواز', blau:'#00695C', blau2:'#004d40', grana:'#00897B', grana2:'#00695C', gold:'#4DB6AC', gold2:'#00897B', bg:'#040a09', surface:'#081513', surface2:'#0c201d', surface3:'#102b27', line:'#1a453d'},
+  {key:'blackYellow', name:'أسود × أصفر', blau:'#FDD835', blau2:'#c7a800', grana:'#FFEE58', grana2:'#FDD835', gold:'#FFF59D', gold2:'#FFEE58', bg:'#0a0900', surface:'#171400', surface2:'#231e00', surface3:'#302900', line:'#4d4000'},
+  {key:'blackViolet', name:'أسود × فيولت غامق', blau:'#4A148C', blau2:'#2f0a5c', grana:'#6A1B9A', grana2:'#4A148C', gold:'#AB47BC', gold2:'#6A1B9A', bg:'#050208', surface:'#0d0512', surface2:'#15081d', surface3:'#1d0b28', line:'#341246'},
+];
+let currentThemeVars = {};
+function applyTheme(key, opts){
+  const t = THEMES.find(x=>x.key===key) || THEMES[0];
+  const root = document.documentElement;
+  root.style.setProperty('--blau', t.blau); root.style.setProperty('--blau-2', t.blau2);
+  root.style.setProperty('--grana', t.grana); root.style.setProperty('--grana-2', t.grana2);
+  root.style.setProperty('--gold', t.gold); root.style.setProperty('--gold-2', t.gold2);
+  root.style.setProperty('--bg', t.bg); root.style.setProperty('--surface', t.surface);
+  root.style.setProperty('--surface-2', t.surface2); root.style.setProperty('--surface-3', t.surface3);
+  root.style.setProperty('--line', t.line);
+  currentThemeVars = t;
+  localStorage.setItem('barca_ps_theme', key);
+  if(!(opts && opts.skipSave)) saveBrandingField('theme', key);
+}
+
+/* ============================================================
+   دعم لغتين — عربي (افتراضي) وإنجليزي. القاموس ده بيغطي هيكل
+   التطبيق الرئيسي (القائمة، الدخول، الإعدادات) كبداية؛ ترجمة كل
+   نصوص الشاشات الداخلية (تفاصيل الجلسات، الفواتير...) خطوة تانية
+   أكبر لسه هنعملها بعد كده لو حبيت.
+   ============================================================ */
+const I18N = {
+  ar: { dir:'rtl', nav_shift:'الشفت', nav_devices:'الأجهزة', nav_rooms:'رومز', nav_drinks:'المشروبات',
+    nav_customers:'العملاء', nav_expenses:'بنود المصروفات', nav_staff:'الموظفون', nav_history:'السجل', nav_settings:'الإعدادات',
+    login_user:'اسم المستخدم', login_pass:'كلمة المرور', login_btn:'تسجيل الدخول', change_branch:'تغيير الفرع',
+    logout:'تسجيل الخروج', change_pw:'تغيير باسوردي', switch_branch:'تبديل الفرع',
+    settings_title:'الإعدادات', settings_club_name:'اسم النادي', settings_logo:'شعار النادي', settings_upload:'رفع صورة',
+    settings_theme:'الثيم', settings_branches:'الفروع', settings_lang:'اللغة', settings_save:'حفظ' },
+  en: { dir:'ltr', nav_shift:'Shift', nav_devices:'Devices', nav_rooms:'Rooms', nav_drinks:'Drinks',
+    nav_customers:'Customers', nav_expenses:'Expense Types', nav_staff:'Staff', nav_history:'History', nav_settings:'Settings',
+    login_user:'Username', login_pass:'Password', login_btn:'Log In', change_branch:'Change Branch',
+    logout:'Log Out', change_pw:'Change Password', switch_branch:'Switch Branch',
+    settings_title:'Settings', settings_club_name:'Club Name', settings_logo:'Club Logo', settings_upload:'Upload Image',
+    settings_theme:'Theme', settings_branches:'Branches', settings_lang:'Language', settings_save:'Save' },
+};
+function t(key){ return (I18N[state.lang || 'ar'] || I18N.ar)[key] || key; }
+function setLang(lang){
+  state.lang = lang === 'en' ? 'en' : 'ar';
+  localStorage.setItem('barca_ps_lang', state.lang);
+  document.documentElement.setAttribute('lang', state.lang);
+  document.documentElement.setAttribute('dir', I18N[state.lang].dir);
+  render();
+}
+
+const state = {
+  shopId: localStorage.getItem(LS_SHOP_KEY) || null,
+  branches: [], branchesLoaded: false,
+  branding: { logoDataUrl:null, appName:null, theme: localStorage.getItem('barca_ps_theme') || 'blackPurple' },
+  sections: {},
+  lang: localStorage.getItem('barca_ps_lang') || 'ar',
+  currentUser: null,
+  users:[], customers:[], devices:[], drinks:[], sessions:[], shifts:[], expenses:[], expenseCategories:[],
+  drinkSales: [],
+  activeShiftId: null,
+  view: 'shift', historyTab: 'shifts', sidebarOpen: false, loginError: '',
+  openDeviceId: null,
+  startKind: 'PS5', startMode: 'solo', startBillingType: 'open', startPrepaidAmount: 0,
+  startCustomerId: '',
+  drinkPickerOpen: false, switchPickerOpen: false, switchKind:'PS5', switchMode:'solo',
+  drinkPickerQty: {},
+  receiptSession: null, reportShift: null, expenseModalOpen: false,
+  confirmDialog: null, noticeMessage: null, inputDialog: null,
+  busy: false,
+  hasMoreClosedSessions: false,
+  loadingOlderSessions: false,
+  // بيع مباشر
+  sellModal: null,
+  sellQty: 1,
+  saleReceipt: null,
+  // إصدار 5
+  closeDiscount: 0,
+  staffEditId: null,
+  historyFrom: '', historyTo: '',
+};
+
+/* ---------- Utilities ---------- */
+function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function money(n){ n = Number(n)||0; return n.toLocaleString('ar-EG', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function nowIso(){ return new Date().toISOString(); }
+function minutesBetween(a,b){ return Math.max(0, (new Date(b) - new Date(a)) / 60000); }
+function fmtDuration(mins){
+  mins = Math.max(0, Math.floor(mins));
+  const h=Math.floor(mins/60), m=Math.floor(mins%60), s=Math.floor((mins*60)%60);
+  const p=x=>String(x).padStart(2,'0');
+  return h>0 ? `${p(h)}:${p(m)}:${p(s)}` : `${p(m)}:${p(s)}`;
+}
+function fmtDateTime(iso){ if(!iso) return '—'; return new Date(iso).toLocaleString('ar-EG', {dateStyle:'medium', timeStyle:'short'}); }
+function currentUser(){ return state.currentUser; }
+function isAdmin(){ return !!state.currentUser && state.currentUser.role === 'admin'; }
+function openShift(){ return state.shifts.find(s => s.id === state.activeShiftId) || null; }
+function categoryLabel(c){ return c==='room' ? 'روم' : 'جهاز'; }
+function roundMoney(n){ return Math.round((Number(n)||0) * 100) / 100; }
+function currentBranch(){ return state.branches.find(b => b.id === state.shopId) || null; }
+function dbCol(name){ return db.collection('shops/'+state.shopId+'/'+name); }
+function dbDoc(path){ return db.doc('shops/'+state.shopId+'/'+path); }
+function sessionKind(s){ return s?.deviceKind || s?.deviceType || 'PS4'; }
+function inDateRange(iso, from, to){
+  if(!iso) return false;
+  const d = String(iso).slice(0,10);
+  if(from && d < from) return false;
+  if(to && d > to) return false;
+  return true;
+}
+
+/* ---------- CSV export ---------- */
+function csvEscape(v){ return '"'+String(v ?? '').replace(/"/g,'""')+'"'; }
+function exportCsv(filename, headers, rows){
+  const lines = [headers, ...rows].map(r=>r.map(csvEscape).join(',')).join('\n');
+  const blob = new Blob(['﻿'+lines], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 800);
+}
+
+/* ---------- Crypto ---------- */
+function randomSalt(){
+  const arr = new Uint8Array(16);
+  (window.crypto || window.msCrypto).getRandomValues(arr);
+  return [...arr].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function sha256Hex(text){
+  const data = new TextEncoder().encode(text);
+  const buf = await (window.crypto || window.msCrypto).subtle.digest('SHA-256', data);
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+/* التشفير القديم (نسخة واحدة SHA-256) — باقي هنا بس عشان نتحقق من الحسابات القديمة ونرقّيها تلقائيًا */
+async function legacyHashPassword(password, salt){ return sha256Hex(salt + '::' + password); }
+function hexToBytes(hex){
+  const arr = new Uint8Array(Math.floor((hex||'').length/2));
+  for(let i=0;i<arr.length;i++) arr[i] = parseInt(hex.substr(i*2,2),16) || 0;
+  return arr;
+}
+const PBKDF2_ITERATIONS = 100000;
+/* تشفير أقوى: PBKDF2 بـ100,000 تكرار بدل SHA-256 لمرة واحدة، عشان يبقى أبطأ بكتير على أي محاولة تخمين */
+async function hashPassword(password, salt){
+  const subtle = (window.crypto || window.msCrypto).subtle;
+  const keyMaterial = await subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
+  const bits = await subtle.deriveBits(
+    { name:'PBKDF2', salt: hexToBytes(salt), iterations: PBKDF2_ITERATIONS, hash:'SHA-256' },
+    keyMaterial, 256
+  );
+  return [...new Uint8Array(bits)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+/* ---------- Transactions ---------- */
+async function runTx(fn){
+  if(db && typeof db.runTransaction === 'function'){
+    return db.runTransaction(fn);
+  }
+  // شيم بديل لـ Firestore transactions: بنجمّع كل set/update/delete
+  // (زي ما بتتكتب فعلاً في كل أماكن استخدامها في الكود، من غير await)
+  // وبعدين ننفذهم فعليًا ونستنى كل واحد قبل ما نرجّع النتيجة —
+  // بدل ما نسيبهم "fire and forget" ومحدش يستناهم يخلصوا.
+  const ops = [];
+  const tx = {
+    get: ref => ref.get(),
+    set: (ref, data) => { ops.push(()=>ref.set(data)); },
+    update: (ref, data) => { ops.push(()=>ref.update(data)); },
+    delete: ref => { ops.push(()=>ref.delete()); },
+  };
+  const result = await fn(tx);
+  for(const op of ops){ await op(); }
+  return result;
+}
+
+/* ---------- Busy ---------- */
+function setBusy(v){ state.busy = !!v; const el = document.getElementById('busy-overlay'); if(el) el.style.display = v ? 'flex' : 'none'; else if(v) render(); }
+function renderBusyOverlay(){ return state.busy ? `<div class="busy-overlay" id="busy-overlay"><div class="busy-box">جارٍ التنفيذ...</div></div>` : ''; }
+
+/* ---------- Pricing ---------- */
+function defaultHourFromRates(device, kind, mode){ return (device?.rates?.[kind]?.[mode]) || 0; }
+function getPrices(device, kind, mode){
+  const p = device?.prices?.[kind]?.[mode];
+  if(p && (p.q != null || p.h != null || p.hr != null)){
+    return { q: Number(p.q)||0, h: Number(p.h)||0, hr: Number(p.hr)||0 };
+  }
+  const hr = defaultHourFromRates(device, kind, mode);
+  return { q: hr>0?roundMoney(hr/4):0, h: hr>0?roundMoney(hr/2):0, hr: hr||0 };
+}
+function getRate(device, kind, mode){ return getPrices(device, kind, mode).hr; }
+function minutesForAmount(prices, amount){
+  const q = Number(prices.q)||0, h = Number(prices.h)||0, hr = Number(prices.hr)||0;
+  amount = Math.max(0, Number(amount)||0);
+  if(amount <= 0 || hr <= 0) return 0;
+  if(q > 0 && amount < q) return 0; // أقل من سعر الربع = مرفوض
+  if(amount >= hr) return Math.round(amount/hr*60);
+  const pts = [[0,0]];
+  if(q > 0 && q < hr) pts.push([q, 15]);
+  if(h > 0 && h < hr && h > q) pts.push([h, 30]);
+  pts.push([hr, 60]);
+  for(let i=1;i<pts.length;i++){
+    const [a0,m0]=pts[i-1], [a1,m1]=pts[i];
+    if(amount <= a1) return Math.round(m0 + (amount-a0)/(a1-a0)*(m1-m0));
+  }
+  return 60;
+}
+function amountForMinutes(prices, minutes){
+  const q = Number(prices.q)||0, h = Number(prices.h)||0, hr = Number(prices.hr)||0;
+  minutes = Math.max(0, Number(minutes)||0);
+  if(minutes <= 0 || hr <= 0) return 0;
+  if(minutes >= 60) return roundMoney(hr*minutes/60);
+  const pts = [[0,0]];
+  if(q > 0 && q < hr) pts.push([15,q]);
+  if(h > 0 && h < hr && h > q) pts.push([30,h]);
+  pts.push([60,hr]);
+  for(let i=1;i<pts.length;i++){
+    const [m0,a0]=pts[i-1], [m1,a1]=pts[i];
+    if(minutes <= m1) return roundMoney(a0 + (minutes-m0)/(m1-m0)*(a1-a0));
+  }
+  return hr;
+}
+function resolvePrices(customer, device, kind, mode){
+  if(customer && customer.useCustomRate && customer.hourlyRate){
+    const hr = Number(customer.hourlyRate)||0;
+    const base = getPrices(device, kind, mode);
+    const ratio = base.hr > 0 ? hr/base.hr : 1;
+    return { q: roundMoney(base.q*ratio), h: roundMoney(base.h*ratio), hr };
+  }
+  return getPrices(device, kind, mode);
+}
+function resolveRate(customer, device, kind, mode){ return resolvePrices(customer, device, kind, mode).hr; }
+
+function getSegments(session){
+  if(session.segments && session.segments.length) return session.segments;
+  return [{ kind:sessionKind(session), mode:session.mode, rate:session.rate, prices:session.prices, startTime:session.startTime, endTime:session.endTime||null, minutes:null, cost:null }];
+}
+function computeSessionTimeCost(session, atIso){
+  if(session.billingType === 'time'){
+    const prepaid = Number(session.prepaidAmount)||0;
+    const planned = Number(session.plannedMinutes)||0;
+    const totalMins = minutesBetween(session.startTime, atIso);
+    if(totalMins > planned && planned > 0){
+      const segs = getSegments(session);
+      const curSeg = segs[segs.length-1];
+      const curRate = curSeg?.rate || session.rate || 0;
+      const overtimeMins = totalMins - planned;
+      return roundMoney(prepaid + curRate*overtimeMins/60);
+    }
+    return prepaid;
+  }
+  const segs = getSegments(session);
+  let total = 0;
+  segs.forEach((seg,i)=>{
+    const isLast = i === segs.length-1;
+    if(seg.endTime) total += (seg.cost!=null ? Number(seg.cost) : roundMoney(seg.rate*minutesBetween(seg.startTime, seg.endTime)/60));
+    else if(isLast) total += roundMoney(seg.rate*minutesBetween(seg.startTime, atIso)/60);
+  });
+  return roundMoney(total);
+}
+
+/* ---------- Dialogs ---------- */
+function askConfirm(message, action, payload){ state.confirmDialog = { message, action, payload }; render(); }
+function showNotice(message){ state.noticeMessage = message; render(); }
+function askInput(title, fields, action, payload){ state.inputDialog = { title, fields, action, payload }; render(); }
+function cancelConfirmDialog(){ state.confirmDialog = null; render(); }
+function dismissNotice(){ state.noticeMessage = null; render(); }
+function cancelInputDialog(){ state.inputDialog = null; render(); }
+
+async function runConfirmedAction(){
+  const c = state.confirmDialog; state.confirmDialog = null; if(!c) return;
+  const p = c.payload || {};
+  try{
+    setBusy(true);
+    if(c.action === 'remove-station' || c.action === 'delete-station') await dbDoc('devices/'+p.id).delete();
+    else if(c.action === 'delete-customer') await dbDoc('customers/'+p.id).delete();
+    else if(c.action === 'delete-drink') await dbDoc('drinks/'+p.id).delete();
+    else if(c.action === 'delete-staff'){
+      await dbDoc('credentials/'+p.id).delete().catch(()=>{});
+      await dbDoc('users/'+p.id).delete();
+    }
+    else if(c.action === 'delete-expcat') await dbDoc('expenseCategories/'+p.id).delete();
+    else if(c.action === 'delete-expense') await dbDoc('expenses/'+p.id).delete();
+    else if(c.action === 'delete-branch') await db.doc('branches/'+p.id).delete();
+    else if(c.action === 'cancel-session') await doCancelSession(p.sessionId, p.deviceId);
+    else if(c.action === 'delete-drink-sale'){
+      await runTx(async tx=>{
+        const saleRef = dbDoc('drinkSales/'+p.id);
+        const sSnap = await tx.get(saleRef);
+        if(!sSnap.exists) return;
+        const sale = sSnap.data();
+        const dRef = dbDoc('drinks/'+sale.drinkId);
+        const dSnap = await tx.get(dRef);
+        if(dSnap.exists) tx.update(dRef, { stock:(Number(dSnap.data().stock)||0) + (Number(sale.qty)||0) });
+        tx.delete(saleRef);
+      });
+    }
+  }catch(e){ console.error(e); showNotice('تعذر إتمام العملية'); }
+  finally{ setBusy(false); render(); }
+}
+/* حذف/تصحيح بيع مباشر — بيرجّع المخزون (أدمن فقط) */
+function deleteDrinkSale(id){
+  if(!isAdmin()){ showNotice('غير مسموح — المدير فقط'); return; }
+  askConfirm('حذف عملية البيع دي؟ الكمية هترجع للمخزون تلقائيًا.', 'delete-drink-sale', {id});
+}
+async function runInputDialog(){
+  const d = state.inputDialog; state.inputDialog = null; if(!d) return;
+  const values = {};
+  d.fields.forEach(f=>{ values[f.key] = document.getElementById('dlg-field-'+f.key)?.value || ''; });
+  const p = d.payload || {};
+  try{
+    setBusy(true);
+    if(d.action === 'edit-customer-info') await dbDoc('customers/'+p.id).update({ phone:(values.phone||'').trim(), dob:(values.dob||'').trim() });
+    else if(d.action === 'edit-drink') await dbDoc('drinks/'+p.id).update({ price:Math.max(0,Number(values.price)||0), stock:Math.max(0,Number(values.stock)||0) });
+    else if(d.action === 'force-change-password'){
+      const newpass = (values.newpass||'').trim();
+      if(newpass.length < 6){ showNotice('كلمة المرور لازم تكون 6 حروف/أرقام على الأقل'); state.inputDialog = d; return; }
+      const salt = randomSalt();
+      const passwordHash = await hashPassword(newpass, salt);
+      await dbDoc('credentials/'+p.id).set({ salt, passwordHash });
+      await dbDoc('users/'+p.id).update({ mustChangePassword: false });
+      showNotice('تم تغيير كلمة المرور');
+    }
+    else if(d.action === 'add-branch'){ await addBranch(values.name||''); }
+  }catch(e){ console.error(e); showNotice('تعذر الحفظ'); }
+  finally{ setBusy(false); render(); }
+}
+function renderGlobalOverlays(){
+  let html = '';
+  if(state.confirmDialog){
+    html += `<div class="modal-scrim" data-cancel-confirm="1"><div class="modal" style="max-width:380px" onclick="event.stopPropagation()">
+      <div class="modal-head"><h3 class="modal-title">تأكيد</h3></div>
+      <p style="font-size:14px;margin:0 0 18px;line-height:1.7">${esc(state.confirmDialog.message)}</p>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost" style="flex:1" data-cancel-confirm="1">إلغاء</button>
+        <button class="btn btn-danger" style="flex:1" id="run-confirm-btn">تأكيد</button>
+      </div></div></div>`;
+  }
+  if(state.inputDialog){
+    const forced = state.inputDialog.action === 'force-change-password';
+    html += `<div class="modal-scrim" ${forced?'':'data-cancel-input="1"'}><div class="modal" style="max-width:380px" onclick="event.stopPropagation()">
+      <div class="modal-head"><h3 class="modal-title">${esc(state.inputDialog.title)}</h3></div>
+      ${state.inputDialog.fields.map(f=>`<div class="field"><label>${esc(f.label)}</label><input id="dlg-field-${f.key}" type="${f.type||'text'}" value="${esc(f.value||'')}"></div>`).join('')}
+      <div style="display:flex;gap:10px;margin-top:6px">
+        ${forced?'':'<button class="btn btn-ghost" style="flex:1" data-cancel-input="1">إلغاء</button>'}
+        <button class="btn btn-primary" style="flex:1" id="run-input-btn">حفظ</button>
+      </div></div></div>`;
+  }
+  if(state.noticeMessage){
+    html += `<div class="modal-scrim" data-dismiss-notice="1"><div class="modal" style="max-width:380px" onclick="event.stopPropagation()">
+      <div class="modal-head"><h3 class="modal-title">تنبيه</h3></div>
+      <p style="font-size:14px;margin:0 0 18px;line-height:1.7">${esc(state.noticeMessage)}</p>
+      <button class="btn btn-primary" style="width:100%" data-dismiss-notice="1">حسنًا</button>
+    </div></div>`;
+  }
+  return html;
+}
+function attachGlobalOverlayEvents(){
+  document.querySelectorAll('[data-cancel-confirm]').forEach(el=> el.addEventListener('click', cancelConfirmDialog));
+  document.getElementById('run-confirm-btn')?.addEventListener('click', runConfirmedAction);
+  document.querySelectorAll('[data-cancel-input]').forEach(el=> el.addEventListener('click', cancelInputDialog));
+  document.getElementById('run-input-btn')?.addEventListener('click', runInputDialog);
+  document.querySelectorAll('[data-dismiss-notice]').forEach(el=> el.addEventListener('click', dismissNotice));
+}
+
+/* ---------- Boot ---------- */
+async function boot(){
+  document.documentElement.setAttribute('lang', state.lang);
+  document.documentElement.setAttribute('dir', I18N[state.lang].dir);
+  applyTheme(state.branding.theme, {skipSave:true});
+  if(!window.isSecureContext || !(window.crypto && window.crypto.subtle)){
+    bootError = 'الصفحة اتفتحت بطريقة المتصفح بيعتبرها غير آمنة (زي فتح الملف مباشرة من قائمة التنزيلات)، فميزة التشفير المطلوبة لتسجيل الدخول مش متاحة هنا. ارفع الملف مكان زي Netlify (يديك رابط https) وافتحه من الرابط ده بدل ما تفتحه من ملف التنزيلات مباشرة.';
+    render(); return;
+  }
+  try{
+    if(!window.supabase || !window.supabase.createClient) throw new Error('supabase-js لم يتم تحميلها');
+    if(SUPABASE_URL.includes('YOUR-PROJECT') || SUPABASE_ANON_KEY.includes('YOUR-ANON')){
+      throw new Error('لازم تحط SUPABASE_URL و SUPABASE_ANON_KEY الحقيقيين بتوعك في أول السكريبت');
+    }
+    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    db = makeSupabaseFirestoreShim(client);
+  }catch(e){ console.error(e); db = null; }
+  if(!db){ bootError = 'تعذر الاتصال بقاعدة البيانات في هذا العرض.'; render(); return; }
+  await seedBranchesIfEmpty();
+  db.collection('branches').onSnapshot(snap=>{
+    state.branches = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    state.branchesLoaded = true; scheduleRender();
+  }, ()=>{ state.branchesLoaded = true; scheduleRender(); });
+  if(state.shopId){ await enterShop(state.shopId); }
+  setInterval(updateLiveTimers, 1000);
+}
+async function renameBranch(id, name){ if(!name.trim()) return; await db.doc('branches/'+id).update({ name:name.trim() }).catch(()=>{ showNotice('تعذر تغيير اسم الفرع'); }); }
+function saveBrandingField(field, value){
+  if(!state.shopId) return;
+  dbDoc('meta/branding').set({ ...(state.branding||{}), [field]: value }).catch(()=>{});
+}
+async function seedBranchesIfEmpty(){
+  try{
+    const ref = db.doc('global/branchSeed');
+    await runTx(async tx=>{
+      const flag = await tx.get(ref);
+      if(flag.exists) return;
+      const c1 = db.collection('branches').doc();
+      const c2 = db.collection('branches').doc();
+      tx.set(c1, { name:'المحل الأول' });
+      tx.set(c2, { name:'المحل الثاني' });
+      tx.set(ref, { seeded:true, at:nowIso() });
+    });
+  }catch(e){ console.error(e); }
+}
+async function addBranch(name){ if(!name.trim()) return; await db.collection('branches').add({ name:name.trim() }); }
+async function deleteBranch(id){ askConfirm('حذف هذا الفرع من القائمة؟ (بياناته تظل محفوظة)', 'delete-branch', {id}); }
+
+async function enterShop(shopId){
+  state.shopId = shopId; localStorage.setItem(LS_SHOP_KEY, shopId);
+  await seedIfEmpty();
+  subscribe('customers'); subscribe('devices'); subscribe('drinks');
+  subscribe('expenseCategories'); subscribe('expenses'); subscribe('shifts');
+  subscribe('drinkSales');
+  subscribeSessions();
+  const u = dbDoc('meta/shift').onSnapshot(snap=>{
+    state.activeShiftId = snap.exists ? (snap.data().activeShiftId || null) : null;
+    scheduleRender();
+  });
+  shopUnsubs.push(u);
+  const ub = dbDoc('meta/branding').onSnapshot(snap=>{
+    if(snap.exists){
+      state.branding = { logoDataUrl:null, appName:null, theme: state.branding.theme, ...snap.data() };
+      if(state.branding.theme) applyTheme(state.branding.theme, {skipSave:true});
+      document.title = (state.branding.appName || 'نادي البلايستيشن');
+    }
+    scheduleRender();
+  });
+  shopUnsubs.push(ub);
+  const us = dbDoc('meta/sections').onSnapshot(snap=>{
+    state.sections = snap.exists ? (snap.data() || {}) : {};
+    scheduleRender();
+  });
+  shopUnsubs.push(us);
+  await restoreSession();
+  scheduleRender();
+}
+function leaveShop(){
+  shopUnsubs.forEach(fn=>{ try{ fn(); }catch(e){} }); shopUnsubs = [];
+  sessionsUnsubs.forEach(fn=>{ try{ fn(); }catch(e){} }); sessionsUnsubs = [];
+  if(usersSub){ try{ usersSub(); }catch(e){} usersSub = null; }
+  state.shopId = null; localStorage.removeItem(LS_SHOP_KEY);
+  state.currentUser = null; localStorage.removeItem(LS_KEY);
+  state.users=[]; state.customers=[]; state.devices=[]; state.drinks=[]; state.sessions=[];
+  state.shifts=[]; state.expenses=[]; state.expenseCategories=[]; state.activeShiftId=null;
+  state.drinkSales = [];
+  state.sections = {};
+  state.view='shift'; state.hasMoreClosedSessions = false;
+  render();
+}
+function subscribe(name){
+  const u = dbCol(name).onSnapshot(snap=>{
+    state[name] = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    scheduleRender();
+  }, ()=>{ scheduleRender(); });
+  shopUnsubs.push(u);
+}
+function subscribeSessions(){
+  sessionsUnsubs.forEach(fn=>{ try{ fn(); }catch(e){} });
+  sessionsUnsubs = [];
+
+  const u1 = dbCol('sessions').where('status','==','active').onSnapshot(snap=>{
+    const active = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    const closed = state.sessions.filter(s => s.status === 'closed');
+    mergeSessions(active, closed);
+    scheduleRender();
+  }, (err)=>{ console.error('active sessions sub', err); scheduleRender(); });
+  sessionsUnsubs.push(u1);
+
+  const u2 = dbCol('sessions')
+    .where('status','==','closed')
+    .orderBy('startTime','desc')
+    .limit(CLOSED_SESSIONS_LIMIT)
+    .onSnapshot(snap=>{
+      const closed = snap.docs.map(d=>({id:d.id, ...d.data()}));
+      const active = state.sessions.filter(s => s.status === 'active');
+      state.hasMoreClosedSessions = closed.length >= CLOSED_SESSIONS_LIMIT;
+      mergeSessions(active, closed);
+      scheduleRender();
+    }, (err)=>{ console.error('closed sessions sub', err); scheduleRender(); });
+  sessionsUnsubs.push(u2);
+}
+function mergeSessions(active, closed){
+  const map = new Map();
+  active.forEach(s => map.set(s.id, s));
+  closed.forEach(s => { if(!map.has(s.id)) map.set(s.id, s); });
+  state.sessions = Array.from(map.values());
+}
+async function loadOlderSessions(){
+  if(state.loadingOlderSessions) return;
+  const closed = state.sessions.filter(s => s.status === 'closed');
+  if(!closed.length){ showNotice('لا توجد جلسات مغلقة'); return; }
+  const oldest = closed.reduce((min, s) => (s.startTime < min ? s.startTime : min), closed[0].startTime);
+  state.loadingOlderSessions = true;
+  setBusy(true); render();
+  try{
+    const snap = await dbCol('sessions')
+      .where('status','==','closed')
+      .where('startTime','<', oldest)
+      .orderBy('startTime','desc')
+      .limit(OLDER_SESSIONS_CHUNK)
+      .get();
+    const older = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    if(!older.length){
+      state.hasMoreClosedSessions = false;
+      showNotice('لا توجد جلسات أقدم');
+    } else {
+      const active = state.sessions.filter(s => s.status === 'active');
+      const allClosed = [...closed, ...older];
+      mergeSessions(active, allClosed);
+      state.hasMoreClosedSessions = older.length >= OLDER_SESSIONS_CHUNK;
+      showNotice(`تم تحميل ${older.length} جلسة إضافية`);
+    }
+  }catch(e){
+    console.error(e);
+    showNotice('تعذر تحميل الجلسات القديمة — تأكد من إنشاء الـ Index المطلوب');
+  } finally {
+    state.loadingOlderSessions = false;
+    setBusy(false); render();
+  }
+}
+function subscribeUsersIfAdmin(){
+  if(!isAdmin() || usersSub) return;
+  usersSub = dbCol('users').onSnapshot(snap=>{
+    state.users = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    scheduleRender();
+  }, ()=>scheduleRender());
+}
+async function seedIfEmpty(){
+  try{
+    const seedRef = dbDoc('meta/seed');
+    const snap = await seedRef.get();
+    if(snap.exists) return;
+    const salt = randomSalt();
+    const passwordHash = await hashPassword('admin123', salt);
+    const adminRef = dbCol('users').doc();
+    await adminRef.set({ username:'admin', name:'المدير', role:'admin', protected:true, mustChangePassword:true });
+    await dbDoc('credentials/'+adminRef.id).set({ salt, passwordHash });
+    for(const nm of ['جهاز 1','جهاز 2','جهاز 3']){
+      await dbCol('devices').add({ name:nm, category:'device', prices: JSON.parse(JSON.stringify(DEFAULT_PRICES)), status:'idle', sessionId:null });
+    }
+    for(const nm of ['روم 1','روم 2']){
+      await dbCol('devices').add({ name:nm, category:'room', prices: JSON.parse(JSON.stringify(DEFAULT_PRICES)), status:'idle', sessionId:null });
+    }
+    await dbCol('drinks').add({ name:'كوكاكولا', price:15, stock:24, imageUrl:'' });
+    await dbCol('drinks').add({ name:'شيبسي', price:20, stock:15, imageUrl:'' });
+    await seedRef.set({ seeded:true, at:nowIso() });
+  }catch(e){ console.error('seed failed', e); }
+}
+
+/* ---------- Auth ---------- */
+async function restoreSession(){
+  const raw = localStorage.getItem(LS_KEY);
+  if(!raw || !state.shopId){ state.currentUser = null; return; }
+  let saved; try{ saved = JSON.parse(raw); }catch(e){ saved = null; }
+  const username = saved && saved.username;
+  const token = saved && saved.token;
+  if(!username || !token){ localStorage.removeItem(LS_KEY); state.currentUser = null; return; }
+  try{
+    const snap = await db.collection('shops/'+state.shopId+'/users').where('username','==',username).limit(1).get();
+    if(snap.empty){ localStorage.removeItem(LS_KEY); state.currentUser = null; return; }
+    const doc = snap.docs[0];
+    const u = doc.data();
+    // لازم التوكن يتطابق مع اللي اتسجل وقت الدخول — كده محدش يقدر يدخل بحساب حد تاني
+    // لمجرد إنه عرف اليوزرنيم بتاعه وحط الاسم في localStorage
+    if(!u.sessionToken || u.sessionToken !== token){ localStorage.removeItem(LS_KEY); state.currentUser = null; return; }
+    state.currentUser = { id:doc.id, username:u.username, name:u.name||u.username, role:u.role||'staff' };
+    subscribeUsersIfAdmin();
+  }catch(e){
+    console.error(e);
+    state.currentUser = null;
+  }
+}
+async function doLogin(username, password){
+  username = (username||'').trim();
+  if(!username || !password){ state.loginError = 'أدخل البيانات كاملة'; render(); return; }
+  setBusy(true);
+  try{
+    const snap = await db.collection('shops/'+state.shopId+'/users').where('username','==',username).limit(1).get();
+    if(snap.empty){ state.loginError = 'بيانات الدخول غير صحيحة'; return; }
+    const doc = snap.docs[0];
+    const u = doc.data();
+    let valid = false;
+    const credSnap = await dbDoc('credentials/'+doc.id).get();
+    if(credSnap.exists){
+      const cred = credSnap.data();
+      const hash = await hashPassword(password, cred.salt || '');
+      if(hash === cred.passwordHash){
+        valid = true;
+      } else {
+        const legacyHash = await legacyHashPassword(password, cred.salt || '');
+        if(legacyHash === cred.passwordHash){
+          valid = true;
+          // ترقية تلقائية للتشفير الأقوى أول ما الحساب القديم يسجل دخول بنجاح
+          const upgraded = await hashPassword(password, cred.salt || '');
+          await dbDoc('credentials/'+doc.id).set({ salt: cred.salt||'', passwordHash: upgraded }).catch(()=>{});
+        }
+      }
+    } else if(u.password && u.password === password){
+      const salt = randomSalt();
+      const passwordHash = await hashPassword(password, salt);
+      await dbDoc('credentials/'+doc.id).set({ salt, passwordHash });
+      await dbDoc('users/'+doc.id).update({ password: null }).catch(()=>{});
+      valid = true;
+    }
+    if(!valid){ state.loginError = 'بيانات الدخول غير صحيحة'; return; }
+    state.loginError = '';
+    state.currentUser = { id:doc.id, username:u.username, name:u.name||u.username, role:u.role||'staff' };
+    // توكن جلسة عشوائي بيتغيّر مع كل تسجيل دخول، بدل الاعتماد على اسم المستخدم لوحده
+    // (اللي كان ممكن حد يحطه يدويًا في localStorage ويدخل بحساب مش بتاعه من غير باسورد)
+    const sessionToken = randomSalt();
+    await dbDoc('users/'+doc.id).update({ sessionToken }).catch(()=>{});
+    localStorage.setItem(LS_KEY, JSON.stringify({ username: u.username, token: sessionToken }));
+    state.view='shift';
+    subscribeUsersIfAdmin();
+    if(u.mustChangePassword){
+      askInput('لازم تغيّر كلمة المرور الافتراضية الأول', [
+        {key:'newpass', label:'كلمة مرور جديدة', type:'password', value:''},
+      ], 'force-change-password', {id:doc.id});
+    }
+  }catch(e){
+    console.error(e);
+    state.loginError = 'تعذر تسجيل الدخول، حاول مرة أخرى';
+  } finally {
+    setBusy(false);
+    render();
+  }
+}
+function doLogout(){
+  if(usersSub){ try{ usersSub(); }catch(e){} usersSub = null; }
+  state.users = [];
+  state.currentUser = null; localStorage.removeItem(LS_KEY); render();
+}
+
+/* ---------- Shift ---------- */
+async function startShift(){
+  const u = currentUser(); if(!u) return;
+  try{
+    setBusy(true);
+    const ref = await dbCol('shifts').add({
+      openedBy:u.username, openedByName: u.name||u.username,
+      startTime: nowIso(), endTime:null, status:'open',
+      deviceBreakdown:[], drinkBreakdown:[], expenseBreakdown:[],
+      deviceRevenue:0, drinksRevenue:0, expensesTotal:0, netTotal:0,
+    });
+    await dbDoc('meta/shift').set({ activeShiftId: ref.id });
+  }catch(e){ console.error(e); showNotice('تعذر بدء الشفت'); }
+  finally{ setBusy(false); scheduleRender(); }
+}
+async function addExpense(categoryId, amount, note){
+  const shift = openShift(); if(!shift){ showNotice('لا يوجد شفت مفتوح'); return; }
+  const cat = state.expenseCategories.find(c=>c.id===categoryId);
+  if(!cat || !amount) return;
+  const u = currentUser();
+  try{
+    setBusy(true);
+    await dbCol('expenses').add({ shiftId:shift.id, categoryId, categoryName: cat.name,
+      amount:Number(amount)||0, note:(note||'').trim(), time:nowIso(),
+      addedBy:u.username, addedByName:u.name||u.username });
+    state.expenseModalOpen = false;
+  }catch(e){ console.error(e); showNotice('تعذر حفظ المصروف'); }
+  finally{ setBusy(false); scheduleRender(); }
+}
+async function deleteExpense(id){ askConfirm('حذف هذا المصروف؟', 'delete-expense', {id}); }
+
+function buildBreakdownFor(shiftId){
+  const sessionsInShift = state.sessions.filter(s => s.shiftId === shiftId && s.status === 'closed');
+  const devMap = {};
+  sessionsInShift.forEach(s=>{
+    const discount = Number(s.discount)||0;
+    if(s.billingType === 'time'){
+      const key = (s.stationCategory||'device') + '__' + sessionKind(s) + '__' + (s.mode||'solo');
+      if(!devMap[key]) devMap[key] = { key, category:s.stationCategory||'device', kind:sessionKind(s), modeLabel: MODE_LABEL[s.mode]||s.mode, count:0, revenue:0 };
+      devMap[key].count++;
+      devMap[key].revenue += Math.max(0, (Number(s.timeCost)||0) - discount); // الصافي بعد الخصم
+    } else {
+      let lastKey = null;
+      getSegments(s).forEach(seg=>{
+        if(!seg.endTime) return;
+        const key = (s.stationCategory||'device') + '__' + (seg.kind||'?') + '__' + (seg.mode||'solo');
+        if(!devMap[key]) devMap[key] = { key, category:s.stationCategory||'device', kind:seg.kind, modeLabel: MODE_LABEL[seg.mode]||seg.mode, count:0, revenue:0 };
+        devMap[key].count++;
+        devMap[key].revenue += Number(seg.cost)||0;
+        lastKey = key;
+      });
+      if(lastKey && discount > 0) devMap[lastKey].revenue = Math.max(0, devMap[lastKey].revenue - discount); // الخصم على آخر نمط
+    }
+  });
+  const deviceBreakdown = Object.values(devMap).sort((a,b)=> a.category.localeCompare(b.category) || String(a.kind).localeCompare(String(b.kind)) || a.modeLabel.localeCompare(b.modeLabel));
+
+  const drinkMap = {};
+  state.drinks.forEach(d => { drinkMap[d.id] = { drinkId:d.id, name:d.name, price:d.price, qty:0, revenue:0 }; });
+  sessionsInShift.forEach(s=>{
+    (s.drinks||[]).forEach(l=>{
+      if(!drinkMap[l.drinkId]) drinkMap[l.drinkId] = { drinkId:l.drinkId, name:l.name, price:l.price, qty:0, revenue:0 };
+      drinkMap[l.drinkId].qty += l.qty;
+      drinkMap[l.drinkId].revenue += l.qty*l.price;
+    });
+  });
+  const directSales = state.drinkSales.filter(x => x.shiftId === shiftId);
+  directSales.forEach(sale=>{
+    if(!drinkMap[sale.drinkId]) drinkMap[sale.drinkId] = { drinkId:sale.drinkId, name:sale.drinkName, price:sale.price, qty:0, revenue:0 };
+    drinkMap[sale.drinkId].qty += sale.qty;
+    drinkMap[sale.drinkId].revenue += sale.qty*sale.price;
+  });
+  const drinkBreakdown = Object.values(drinkMap);
+
+  const expenseBreakdown = state.expenses.filter(e => e.shiftId === shiftId)
+    .map(e => ({ category:e.categoryName, amount:e.amount, note:e.note, time:e.time }));
+  const deviceRevenue = deviceBreakdown.reduce((a,x)=>a+x.revenue,0);
+  const drinksRevenue = drinkBreakdown.reduce((a,x)=>a+x.revenue,0);
+  const expensesTotal = expenseBreakdown.reduce((a,x)=>a+Number(x.amount||0),0);
+  const netTotal = deviceRevenue + drinksRevenue - expensesTotal;
+  return { deviceBreakdown, drinkBreakdown, expenseBreakdown, deviceRevenue, drinksRevenue, expensesTotal, netTotal };
+}
+async function endShift(){
+  const shift = openShift(); if(!shift) return;
+  const running = state.devices.filter(d => d.status==='active')
+    .filter(d=>{ const s = state.sessions.find(x=>x.id===d.sessionId); return s && s.shiftId===shift.id; });
+  if(running.length){ showNotice('أنهِ كل الجلسات الشغالة أولاً: ' + running.map(d=>d.name).join('، ')); return; }
+  try{
+    setBusy(true);
+    const b = buildBreakdownFor(shift.id);
+    const endTime = nowIso();
+    await dbDoc('shifts/'+shift.id).update({ status:'closed', endTime, ...b });
+    await dbDoc('meta/shift').set({ activeShiftId:null });
+    state.reportShift = { ...shift, endTime, status:'closed', ...b };
+  }catch(e){ console.error(e); showNotice('تعذر إنهاء الشفت'); }
+  finally{ setBusy(false); render(); }
+}
+
+/* ---------- Session actions ---------- */
+async function startSession(deviceId, customerId, kind, mode, billingType, prepaidAmount){
+  const device = state.devices.find(d => d.id === deviceId);
+  if(!device || device.status === 'active') return;
+  if(!openShift()){ showNotice('افتح الشفت أولاً من صفحة "الشفت"'); return; }
+  const customer = customerId ? state.customers.find(c=>c.id===customerId) : null;
+  const prices = resolvePrices(customer, device, kind, mode);
+  const isTime = billingType === 'time';
+  const amount = isTime ? Number(prepaidAmount)||0 : 0;
+  if(isTime && amount > 0 && prices.q > 0 && amount < prices.q){
+    showNotice('المبلغ أقل من سعر الربع ساعة (' + money(prices.q) + ' ج.م) — اختر مبلغًا أكبر'); return;
+  }
+  const plannedMinutes = (isTime && amount > 0) ? minutesForAmount(prices, amount) : null;
+  const startTime = nowIso();
+
+  setBusy(true);
+  try{
+    const deviceRef = dbDoc('devices/'+deviceId);
+    const newSessionRef = dbCol('sessions').doc();
+    const shiftId = openShift().id;
+    await runTx(async tx=>{
+      const dSnap = await tx.get(deviceRef);
+      if(!dSnap.exists) throw new Error('الجهاز غير موجود');
+      const d = dSnap.data();
+      if(d.status === 'active') throw new Error('الجهاز محجوز من موظف آخر');
+      tx.set(newSessionRef, {
+        deviceId, deviceName: device.name, stationCategory: device.category || 'device',
+        deviceKind: kind, deviceType: kind, mode: mode || 'solo',
+        customerId: customer ? customer.id : null, customerName: customer ? customer.name : 'زائر بدون حساب',
+        rate: prices.hr, prices, startTime, endTime:null, status:'active',
+        billingType: isTime ? 'time' : 'open', prepaidAmount: amount, plannedMinutes,
+        segments: [{ kind, mode: mode||'solo', rate: prices.hr, prices, startTime, endTime:null, minutes:null, cost:null }],
+        drinks:[], timeCost: isTime ? amount : 0, drinksCost:0, discount:0, total: isTime ? amount : 0,
+        shiftId,
+      });
+      tx.update(deviceRef, { status:'active', sessionId: newSessionRef.id });
+    });
+    state.openDeviceId = deviceId;
+    state.startKind='PS5'; state.startMode='solo'; state.startBillingType='open'; state.startPrepaidAmount=0; state.startCustomerId='';
+    state.drinkPickerQty = {}; state.closeDiscount = 0;
+  }catch(e){ console.error(e); showNotice(e.message || 'تعذر بدء الجلسة'); }
+  finally{ setBusy(false); scheduleRender(); }
+}
+
+async function switchSessionRate(sessionId, newKind, newMode){
+  const session = state.sessions.find(s=>s.id===sessionId); if(!session) return;
+  if(sessionKind(session) === newKind && session.mode === newMode){
+    state.switchPickerOpen = false; scheduleRender(); return;
+  }
+  const device = state.devices.find(d=>d.id===session.deviceId);
+  const customer = session.customerId ? state.customers.find(c=>c.id===session.customerId) : null;
+  const newPrices = resolvePrices(customer, device, newKind, newMode);
+  const now = nowIso();
+  const segments = getSegments(session).map(s=>({...s}));
+  const last = segments[segments.length-1];
+  if(!last.endTime){
+    const segMins = minutesBetween(last.startTime, now);
+    last.endTime = now; last.minutes = segMins;
+    last.cost = roundMoney(last.rate*segMins/60);
+  }
+  segments.push({ kind:newKind, mode:newMode, rate:newPrices.hr, prices:newPrices, startTime:now, endTime:null, minutes:null, cost:null });
+
+  let newPlannedMinutes = session.plannedMinutes;
+  if(session.billingType === 'time' && Number(session.prepaidAmount) > 0){
+    let consumed = 0;
+    for(const seg of segments.slice(0,-1)){
+      const segMins = Number(seg.minutes) || 0;
+      const segPrices = seg.prices || { q:0, h:0, hr: seg.rate||0 };
+      consumed += amountForMinutes(segPrices, segMins);
+    }
+    const remaining = Math.max(0, Number(session.prepaidAmount) - consumed);
+    const totalElapsed = minutesBetween(session.startTime, now);
+    newPlannedMinutes = Math.round(totalElapsed + minutesForAmount(newPrices, remaining));
+  }
+
+  const drinksCost = (session.drinks||[]).reduce((a,x)=>a+x.qty*x.price,0);
+  const timeCost = computeSessionTimeCost({ ...session, segments, plannedMinutes: newPlannedMinutes }, nowIso());
+  setBusy(true);
+  try{
+    await dbDoc('sessions/'+sessionId).update({
+      segments, deviceKind:newKind, deviceType:newKind, mode:newMode,
+      rate: newPrices.hr, prices: newPrices, plannedMinutes: newPlannedMinutes,
+      timeCost, total: timeCost + drinksCost,
+    });
+    state.switchPickerOpen = false;
+  }catch(e){ console.error(e); showNotice('تعذر تغيير النمط'); }
+  finally{ setBusy(false); scheduleRender(); }
+}
+function activeSessionFor(deviceId){
+  const device = state.devices.find(d => d.id === deviceId);
+  if(!device || !device.sessionId) return null;
+  return state.sessions.find(s => s.id === device.sessionId) || null;
+}
+
+async function addDrinkToSession(sessionId, drinkId, qty){
+  qty = Math.max(1, Number(qty)||1);
+  const drink = state.drinks.find(d => d.id === drinkId);
+  if(!drink) return;
+  setBusy(true);
+  try{
+    const sessionRef = dbDoc('sessions/'+sessionId);
+    const drinkRef = dbDoc('drinks/'+drinkId);
+    await runTx(async tx=>{
+      const [sSnap, dSnap] = [await tx.get(sessionRef), await tx.get(drinkRef)];
+      if(!sSnap.exists) throw new Error('الجلسة غير موجودة');
+      if(!dSnap.exists) throw new Error('المشروب غير موجود');
+      const s = sSnap.data();
+      const d = dSnap.data();
+      const stock = Number(d.stock)||0;
+      if(stock < qty) throw new Error('الكمية المتاحة بالمخزون غير كافية');
+      const drinksList = Array.isArray(s.drinks) ? [...s.drinks] : [];
+      const existing = drinksList.find(x => x.drinkId === drinkId);
+      if(existing) existing.qty += qty;
+      else drinksList.push({ drinkId, name:d.name, price:d.price, qty });
+      const drinksCost = drinksList.reduce((a,x)=>a+x.qty*x.price,0);
+      const timeCost = computeSessionTimeCost({ ...s, drinks: drinksList }, nowIso());
+      tx.update(drinkRef, { stock: stock - qty });
+      tx.update(sessionRef, { drinks:drinksList, drinksCost, timeCost, total:drinksCost+timeCost });
+    });
+    state.drinkPickerOpen = false;
+  }catch(e){ console.error(e); showNotice(e.message || 'تعذر إضافة المشروب'); }
+  finally{ setBusy(false); scheduleRender(); }
+}
+async function removeDrinkLine(sessionId, drinkId){
+  setBusy(true);
+  try{
+    const sessionRef = dbDoc('sessions/'+sessionId);
+    await runTx(async tx=>{
+      const sSnap = await tx.get(sessionRef);
+      if(!sSnap.exists) throw new Error('الجلسة غير موجودة');
+      const s = sSnap.data();
+      const line = (s.drinks||[]).find(x => x.drinkId === drinkId);
+      if(!line) return;
+      const drinkRef = dbDoc('drinks/'+drinkId);
+      const dSnap = await tx.get(drinkRef);
+      const curStock = dSnap.exists ? (Number(dSnap.data().stock)||0) : 0;
+      if(dSnap.exists) tx.update(drinkRef, { stock: curStock + line.qty });
+      const drinksList = (s.drinks||[]).filter(x => x.drinkId !== drinkId);
+      const drinksCost = drinksList.reduce((a,x)=>a+x.qty*x.price,0);
+      const timeCost = computeSessionTimeCost({ ...s, drinks: drinksList }, nowIso());
+      tx.update(sessionRef, { drinks:drinksList, drinksCost, timeCost, total:drinksCost+timeCost });
+    });
+  }catch(e){ console.error(e); showNotice('تعذر حذف المشروب'); }
+  finally{ setBusy(false); scheduleRender(); }
+}
+async function closeSession(sessionId, deviceId){
+  const session = state.sessions.find(s => s.id === sessionId); if(!session) return;
+  setBusy(true);
+  try{
+    const endTime = nowIso();
+    const segments = getSegments(session).map(s=>({...s}));
+    const last = segments[segments.length-1];
+    if(!last.endTime){
+      const segMins = minutesBetween(last.startTime, endTime);
+      last.endTime = endTime; last.minutes = segMins;
+      last.cost = roundMoney(last.rate*segMins/60);
+    }
+    const timeCost = computeSessionTimeCost(session, endTime);
+    const drinksCost = (session.drinks||[]).reduce((a,x)=>a+x.qty*x.price,0);
+    // خصم يدوي — الأدمن فقط
+    const discount = isAdmin() ? Math.min(Math.max(0, Number(state.closeDiscount)||0), timeCost + drinksCost) : 0;
+    const total = Math.max(0, timeCost + drinksCost - discount);
+    const prepaid = session.billingType==='time' ? Number(session.prepaidAmount)||0 : 0;
+    const dueAfterPrepaid = Math.max(0, total - prepaid);
+
+    const sessionRef = dbDoc('sessions/'+sessionId);
+    const deviceRef = dbDoc('devices/'+deviceId);
+    const customerRef = session.customerId ? dbDoc('customers/'+session.customerId) : null;
+
+    let balanceUsed = 0, cashDue = dueAfterPrepaid, balanceAfter = null;
+    await runTx(async tx=>{
+      if(customerRef){
+        const cSnap = await tx.get(customerRef);
+        const bal = cSnap.exists ? (Number(cSnap.data().balance)||0) : 0;
+        if(bal >= dueAfterPrepaid){ balanceUsed = dueAfterPrepaid; cashDue = 0; balanceAfter = bal - dueAfterPrepaid; }
+        else { balanceUsed = bal; cashDue = dueAfterPrepaid - bal; balanceAfter = 0; }
+        tx.update(customerRef, { balance: balanceAfter });
+      }
+      tx.update(sessionRef, { status:'closed', endTime, segments, timeCost, drinksCost, discount, total, balanceUsed, cashDue, balanceAfter });
+      tx.update(deviceRef, { status:'idle', sessionId:null });
+    });
+
+    state.openDeviceId = null;
+    state.closeDiscount = 0;
+    state.receiptSession = { ...session, endTime, segments, timeCost, drinksCost, discount, total, balanceUsed, cashDue, balanceAfter, status:'closed' };
+  }catch(e){ console.error(e); showNotice('تعذر إنهاء الجلسة'); }
+  finally{ setBusy(false); scheduleRender(); }
+}
+/* إلغاء الجلسة: الأدمن فقط — الموظف لا يستطيع إطلاقًا */
+function cancelSession(sessionId, deviceId){
+  if(!isAdmin()){ showNotice('غير مسموح — إلغاء الجلسات للمدير فقط'); return; }
+  askConfirm('إلغاء هذه الجلسة؟ سيتم إرجاع المشروبات للمخزون.', 'cancel-session', {sessionId, deviceId});
+}
+async function doCancelSession(sessionId, deviceId){
+  const session = state.sessions.find(s => s.id === sessionId);
+  const sessionRef = dbDoc('sessions/'+sessionId);
+  const deviceRef = dbDoc('devices/'+deviceId);
+  await runTx(async tx=>{
+    if(session){
+      for(const line of (session.drinks||[])){
+        const dRef = dbDoc('drinks/'+line.drinkId);
+        const dSnap = await tx.get(dRef);
+        if(dSnap.exists){
+          tx.update(dRef, { stock: (Number(dSnap.data().stock)||0) + line.qty });
+        }
+      }
+    }
+    tx.delete(sessionRef);
+    tx.update(deviceRef, { status:'idle', sessionId:null });
+  });
+  state.openDeviceId = null;
+}
+
+/* ---------- Direct drink sale ---------- */
+function openSellModal(drinkId){
+  state.sellModal = drinkId;
+  state.sellQty = 1;
+  render();
+}
+function closeSellModal(){
+  state.sellModal = null;
+  state.sellQty = 1;
+  render();
+}
+async function sellDrink(drinkId, qty){
+  qty = Math.max(1, Number(qty)||1);
+  const drink = state.drinks.find(d => d.id === drinkId);
+  if(!drink) return;
+  const shift = openShift();
+  const u = currentUser();
+  setBusy(true);
+  try{
+    const drinkRef = dbDoc('drinks/'+drinkId);
+    const saleRef = dbCol('drinkSales').doc();
+    const sale = {
+      drinkId, drinkName: drink.name, price: Number(drink.price)||0,
+      qty, total: qty * (Number(drink.price)||0),
+      time: nowIso(),
+      soldBy: u ? u.username : 'unknown',
+      soldByName: u ? (u.name||u.username) : 'غير معروف',
+      shiftId: shift ? shift.id : null,
+    };
+    await runTx(async tx=>{
+      const dSnap = await tx.get(drinkRef);
+      if(!dSnap.exists) throw new Error('المشروب غير موجود');
+      const stock = Number(dSnap.data().stock)||0;
+      if(stock < qty) throw new Error('الكمية المتاحة بالمخزون غير كافية');
+      tx.update(drinkRef, { stock: stock - qty });
+      tx.set(saleRef, sale);
+    });
+    state.sellModal = null;
+    state.sellQty = 1;
+    state.saleReceipt = { id: saleRef.id, ...sale };
+  }catch(e){ console.error(e); showNotice(e.message || 'تعذر إتمام البيع'); }
+  finally{ setBusy(false); scheduleRender(); }
+}
+function renderSellModal(){
+  const drink = state.drinks.find(d => d.id === state.sellModal);
+  if(!drink) return '';
+  const qty = Math.max(1, Number(state.sellQty)||1);
+  const maxQty = Number(drink.stock)||0;
+  const total = qty * (Number(drink.price)||0);
+  const shiftOpen = !!openShift();
+  return `<div class="modal-scrim" data-close-sell="1"><div class="modal" style="max-width:420px" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <h3 class="modal-title">بيع مشروب<small>${esc(drink.name)} · متاح ${maxQty}</small></h3>
+      <button class="modal-close" data-close-sell="1">✕</button>
+    </div>
+    ${!shiftOpen ? `<div class="form-card" style="border-color:var(--gold);margin-bottom:14px;font-size:13px">لا يوجد شفت مفتوح — البيع مش هيتسجل في تقرير الشفت، لكن المخزون هيتخصم عادي.</div>` : ''}
+    <div class="field"><label>الكمية</label></div>
+    <div class="mode-choice" style="grid-template-columns:1fr;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:center;gap:14px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:14px">
+        <button class="btn btn-ghost" data-sell-dec style="width:44px;height:44px;font-size:22px;padding:0">−</button>
+        <span class="num" style="font-size:28px;font-weight:800;min-width:60px;text-align:center">${qty}</span>
+        <button class="btn btn-ghost" data-sell-inc style="width:44px;height:44px;font-size:22px;padding:0">+</button>
+      </div>
+    </div>
+    <div class="kv-row"><span class="k">سعر الوحدة</span><span class="v num">${money(drink.price)} ج.م</span></div>
+    <div class="kv-row"><span class="k">المخزون بعد البيع</span><span class="v num">${Math.max(0, maxQty - qty)}</span></div>
+    <div class="total-strip"><span>الإجمالي</span><span class="amt num">${money(total)} ج.م</span></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-ghost" style="flex:1" data-close-sell="1">إلغاء</button>
+      <button class="btn btn-gold" style="flex:1" id="confirm-sell-btn" ${qty>maxQty || maxQty<1 ? 'disabled':''}>تأكيد البيع</button>
+    </div>
+  </div></div>`;
+}
+function renderSaleReceiptModal(s){
+  return `<div class="modal-scrim" data-close-sale-receipt="1"><div class="modal" style="max-width:420px" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <h3 class="modal-title">فاتورة بيع<small>تم البيع بنجاح</small></h3>
+      <button class="modal-close" data-close-sale-receipt="1">✕</button>
+    </div>
+    <div id="sale-receipt-content"><div class="receipt">
+      <div class="receipt-head">${renderLogo(64)}<h2>${esc(brandName())}</h2><p>فاتورة بيع</p></div>
+      <hr>
+      <div class="r-row"><span>التاريخ</span><b>${fmtDateTime(s.time)}</b></div>
+      <div class="r-row"><span>الموظف</span><b>${esc(s.soldByName)}</b></div>
+      <hr>
+      <table>
+        <thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead>
+        <tbody><tr><td>${esc(s.drinkName)}</td><td class="num">${s.qty}</td><td class="num">${money(s.price)}</td><td class="num">${money(s.total)}</td></tr></tbody>
+      </table>
+      <hr>
+      <div class="r-row" style="font-size:15px;color:#A50044;font-weight:800"><span>الإجمالي المدفوع</span><b>${money(s.total)} ج.م</b></div>
+    </div></div>
+    <div style="display:flex; gap:10px; margin-top:14px;">
+      <button class="btn btn-ghost" style="flex:1" data-close-sale-receipt="1">إغلاق</button>
+      <button class="btn btn-primary" style="flex:1" id="print-sale-receipt-btn">🖨️ طباعة</button>
+    </div>
+  </div></div>`;
+}
+
+/* ---------- CRUD ---------- */
+async function addCustomer(name, phone, dob, balance, rate, useCustomRate){
+  if(!name.trim()) return;
+  try{
+    setBusy(true);
+    await dbCol('customers').add({ name:name.trim(), phone:(phone||'').trim(), dob:(dob||'').trim(),
+      balance:Number(balance)||0, hourlyRate:Math.max(0,Number(rate)||0), useCustomRate:!!useCustomRate });
+  }catch(e){ console.error(e); showNotice('تعذر إضافة العميل'); }
+  finally{ setBusy(false); }
+}
+async function updateCustomerRate(id, rate){ try{ await dbDoc('customers/'+id).update({ hourlyRate:Math.max(0,Number(rate)||0) }); }catch(e){ showNotice('تعذر التحديث'); } }
+async function updateCustomerRateToggle(id, enabled){ try{ await dbDoc('customers/'+id).update({ useCustomRate:!!enabled }); }catch(e){ showNotice('تعذر التحديث'); } }
+async function updateCustomerBalance(id, balance){ try{ await dbDoc('customers/'+id).update({ balance:Number(balance)||0 }); }catch(e){ showNotice('تعذر التحديث'); } }
+function editCustomerInfo(id){
+  const c = state.customers.find(x=>x.id===id); if(!c) return;
+  askInput('تعديل بيانات العميل', [
+    {key:'phone', label:'رقم الهاتف', value:c.phone||''},
+    {key:'dob', label:'تاريخ الميلاد', value:c.dob||''},
+  ], 'edit-customer-info', {id});
+}
+async function deleteCustomer(id){ askConfirm('حذف هذا العميل؟', 'delete-customer', {id}); }
+
+async function addDrink(name, price, stock, imageUrl){
+  if(!name.trim()) return;
+  try{
+    setBusy(true);
+    await dbCol('drinks').add({ name:name.trim(), price:Math.max(0,Number(price)||0), stock:Math.max(0,Number(stock)||0), imageUrl:(imageUrl||'').trim() });
+  }catch(e){ console.error(e); showNotice('تعذر إضافة المشروب'); }
+  finally{ setBusy(false); }
+}
+async function deleteDrink(id){ askConfirm('حذف هذا المشروب من القائمة؟', 'delete-drink', {id}); }
+
+async function addStation(category, name){
+  if(!name.trim()) return;
+  try{
+    setBusy(true);
+    await dbCol('devices').add({
+      name:name.trim(), category: category==='room'?'room':'device',
+      status:'idle', sessionId:null, prices: JSON.parse(JSON.stringify(DEFAULT_PRICES)),
+    });
+  }catch(e){ console.error(e); showNotice('تعذر إضافة الجهاز'); }
+  finally{ setBusy(false); }
+}
+async function updateStationPrice(id, kind, mode, field, value){
+  const device = state.devices.find(d=>d.id===id); if(!device) return;
+  const prices = JSON.parse(JSON.stringify(device.prices || {}));
+  KINDS.forEach(k=>{
+    prices[k] = prices[k] || {};
+    MODES.forEach(m=>{
+      const existing = prices[k][m] || {};
+      const base = getPrices(device, k, m);
+      prices[k][m] = { q: existing.q ?? base.q, h: existing.h ?? base.h, hr: existing.hr ?? base.hr };
+    });
+  });
+  prices[kind][mode][field] = Math.max(0,Number(value)||0);
+  try{ await dbDoc('devices/'+id).update({ prices }); }
+  catch(e){ console.error(e); showNotice('تعذر تحديث السعر'); }
+}
+function deleteStation(id){
+  const d = state.devices.find(x=>x.id===id);
+  if(d && d.status === 'active'){ showNotice('لا يمكن الحذف أثناء وجود جلسة نشطة عليه'); return; }
+  askConfirm('تأكيد الحذف؟', 'delete-station', {id});
+}
+function extractNum(name){
+  const m = /(\d+)/.exec(name||'');
+  return m ? parseInt(m[1],10) : Number.POSITIVE_INFINITY;
+}
+async function adjustStationCount(category, delta){
+  const items = state.devices.filter(d => (d.category||'device') === category);
+  const singular = category==='room' ? 'روم' : 'جهاز';
+  if(delta > 0){
+    const used = new Set(items.map(d=>extractNum(d.name)).filter(n=>Number.isFinite(n)));
+    let n = 1; while(used.has(n)) n++;
+    await addStation(category, `${singular} ${n}`);
+  } else if(delta < 0){
+    if(!items.length) return;
+    const idle = items.filter(d => d.status !== 'active');
+    if(!idle.length){ showNotice('لا يمكن إنقاص العدد — كل الأجهزة مشغولة حاليًا، أنهِ الجلسات أولاً'); return; }
+    const sorted = [...idle].sort((a,b)=> (extractNum(b.name)||0) - (extractNum(a.name)||0));
+    const target = sorted[0];
+    askConfirm('سيتم حذف "'+target.name+'" — تأكيد؟', 'remove-station', {id: target.id});
+  }
+}
+async function addStaff(username, password, name, role){
+  username = (username||'').trim();
+  password = (password||'').trim();
+  if(!username || !password) return;
+  try{
+    setBusy(true);
+    const dupSnap = await dbCol('users').where('username','==',username).limit(1).get();
+    if(!dupSnap.empty){ showNotice('اسم المستخدم مستخدم بالفعل'); return; }
+    const salt = randomSalt();
+    const passwordHash = await hashPassword(password, salt);
+    const ref = await dbCol('users').add({ username, name:name.trim()||username, role: role==='admin'?'admin':'staff' });
+    await dbDoc('credentials/'+ref.id).set({ salt, passwordHash });
+  }catch(e){ console.error(e); showNotice('تعذر إضافة الحساب'); }
+  finally{ setBusy(false); }
+}
+/* حذف موظف: المدير الرئيسي (admin) مخفي ومحمي + ممنوع حذف آخر مدير */
+function deleteStaff(id){
+  const u = state.users.find(x=>x.id===id);
+  if(!u) return;
+  if(u.username === 'admin' || u.protected){ showNotice('لا يمكن حذف حساب المدير الرئيسي'); return; }
+  if(state.currentUser && u.username === state.currentUser.username){ showNotice('لا يمكنك حذف حسابك الحالي'); return; }
+  if(u.role === 'admin'){
+    const otherAdmins = state.users.filter(x=>x.role==='admin' && x.username!=='admin' && !x.protected && x.id!==id);
+    if(!otherAdmins.length){ showNotice('لا يمكن حذف آخر مدير في النظام'); return; }
+  }
+  askConfirm('حذف هذا الحساب من هذا الفرع؟', 'delete-staff', {id});
+}
+
+/* تعديل حساب موظف (يوزر/باسورد/اسم/صلاحية) — الأدمن، والتعديل بيتطبق على كل الفروع */
+function openStaffEdit(id){ state.staffEditId = id; render(); }
+function closeStaffEdit(){ state.staffEditId = null; render(); }
+async function saveStaffEdit(){
+  const id = state.staffEditId; if(!id) return;
+  const isSelf = state.currentUser && id === state.currentUser.id;
+  const adminEditing = isAdmin();
+  const u = state.users.find(x=>x.id===id) || (isSelf ? state.currentUser : null);
+  if(!u){ closeStaffEdit(); return; }
+  const oldUsername = u.username;
+  const username = adminEditing ? (val('se-username').trim() || oldUsername) : oldUsername;
+  const name = adminEditing ? (val('se-name').trim() || u.name || username) : (u.name || username);
+  const role = adminEditing ? (val('se-role') === 'admin' ? 'admin' : 'staff') : (u.role || 'staff');
+  const password = val('se-password').trim();
+  if(!username){ showNotice('اسم المستخدم مطلوب'); return; }
+  if(adminEditing && username !== oldUsername){
+    const dup = state.users.find(x=>x.username===username && x.id!==id);
+    if(dup){ showNotice('اسم المستخدم مستخدم بالفعل'); return; }
+  }
+  if(u.username === 'admin' && role !== 'admin'){ showNotice('لا يمكن إنزال صلاحية المدير الرئيسي'); return; }
+  setBusy(true);
+  try{
+    await dbDoc('users/'+id).update({ username, name, role });
+    if(password){
+      const salt = randomSalt();
+      const passwordHash = await hashPassword(password, salt);
+      await dbDoc('credentials/'+id).set({ salt, passwordHash });
+    }
+    // حساب الأدمن الرئيسي (admin) حساب عام: تعديله بيتطبق على كل الفروع —
+    // أما حسابات الموظفين فخاصة بكل فرع ومش بتتنشر على باقي الفروع
+    const isMainAdmin = (oldUsername === 'admin') || !!u.protected;
+    if(isMainAdmin){
+      for(const b of state.branches){
+        if(b.id === state.shopId) continue;
+        try{
+          const snap = await db.collection('shops/'+b.id+'/users').where('username','==',oldUsername).limit(5).get();
+          for(const d of snap.docs){
+            await db.collection('shops/'+b.id+'/users').doc(d.id).update({ username, name, role });
+            if(password){
+              const salt2 = randomSalt();
+              const hash2 = await hashPassword(password, salt2);
+              await db.doc('shops/'+b.id+'/credentials/'+d.id).set({ salt: salt2, passwordHash: hash2 });
+            }
+          }
+        }catch(e){ console.error('branch propagate failed', b.id, e); }
+      }
+    }
+    if(isSelf && state.currentUser){
+      state.currentUser.username = username;
+      state.currentUser.name = name;
+      state.currentUser.role = role;
+      const raw = localStorage.getItem(LS_KEY);
+      let saved; try{ saved = JSON.parse(raw); }catch(e){ saved = null; }
+      if(saved) localStorage.setItem(LS_KEY, JSON.stringify({ username, token: saved.token }));
+    }
+    state.staffEditId = null;
+    showNotice((isMainAdmin ? 'تم حفظ التعديلات على جميع الفروع' : 'تم حفظ التعديلات على هذا الفرع') + (password ? ' (شملت كلمة المرور)' : ''));
+  }catch(e){ console.error(e); showNotice('تعذر الحفظ'); }
+  finally{ setBusy(false); scheduleRender(); }
+}
+
+async function addExpenseCategory(name){ if(!name.trim()) return; try{ await dbCol('expenseCategories').add({ name:name.trim() }); }catch(e){ showNotice('تعذر الإضافة'); } }
+async function deleteExpenseCategory(id){ askConfirm('حذف هذا البند؟', 'delete-expcat', {id}); }
+
+/* ---------- Render ---------- */
+function scheduleRender(){
+  if(renderQueued) return;
+  renderQueued = true;
+  queueMicrotask(()=>{ renderQueued = false; render(); });
+}
+function render(){
+  if(rendering) return;
+  rendering = true;
+  const app = document.getElementById('app');
+  const active = document.activeElement;
+  const focusId = active && active.id ? active.id : null;
+  const focusVal = active && ('value' in active) ? active.value : null;
+  const selStart = active && ('selectionStart' in active) ? active.selectionStart : null;
+  const selEnd = active && ('selectionEnd' in active) ? active.selectionEnd : null;
+
+  if(bootError){ app.innerHTML = renderBootError(); rendering = false; return; }
+  let html, attach;
+  if(!state.shopId){ html = renderBranchSelector(); attach = attachBranchSelectorEvents; }
+  else if(!currentUser()){ html = renderLogin(); attach = attachLoginEvents; }
+  else { html = renderShell(); attach = attachShellEvents; }
+  app.innerHTML = html + renderGlobalOverlays() + renderBusyOverlay();
+  try{ attach(); }catch(e){ console.error('attach error', e); }
+  attachGlobalOverlayEvents();
+
+  if(focusId){
+    const el = document.getElementById(focusId);
+    if(el){
+      if(focusVal !== null && 'value' in el && el.value !== focusVal) el.value = focusVal;
+      try{ el.focus({preventScroll:true}); }catch(e){ el.focus(); }
+      if(selStart != null && typeof el.setSelectionRange === 'function'){
+        try{ el.setSelectionRange(selStart, selEnd); }catch(e){}
+      }
+    }
+  }
+  rendering = false;
+}
+
+function renderBranchSelector(){
+  if(!state.branchesLoaded){
+    return `<div class="login-wrap"><div class="login-card">${genericLogoSvg(100)}<div class="brand-title">${esc(brandName())}</div><div class="brand-sub">جارِ التحميل...</div></div></div>`;
+  }
+  const rows = state.branches.map(b=>`
+    <div class="row-item link-row" data-select-branch="${b.id}">
+      <div class="row-avatar">🏪</div>
+      <div class="row-main"><div class="row-title">${esc(b.name)}</div></div>
+      <div class="row-actions"><button class="btn btn-primary btn-sm">دخول</button></div>
+    </div>`).join('');
+  return `<div class="login-wrap"><div class="login-card" style="max-width:420px">
+    ${genericLogoSvg(100)}
+    <div class="brand-title">${esc(brandName())}</div>
+    <div class="brand-sub">اختر الفرع للدخول إليه</div>
+    <div class="list-card" style="text-align:right;margin-bottom:16px">${rows || `<div class="empty-state">لا توجد فروع بعد</div>`}</div>
+    ${renderFooter()}
+  </div></div>`;
+}
+function attachBranchSelectorEvents(){
+  document.querySelectorAll('[data-select-branch]').forEach(el=> el.addEventListener('click', ()=> enterShop(el.getAttribute('data-select-branch'))));
+}
+function renderBootError(){
+  return `<div class="login-wrap"><div class="login-card">${genericLogoSvg(56)}
+    <p style="color:var(--danger)">${esc(bootError)}</p>
+    <p style="color:var(--text-dim);font-size:12px">جرّب فتح الصفحة من رابطها المنشور مباشرة.</p>
+  </div></div>`;
+}
+
+let crestCounter = 0;
+function brandName(){ return (state.branding && state.branding.appName) ? state.branding.appName : 'نادي البلايستيشن'; }
+/* شعار عام (بدون أي هوية برشلونة) بيتفعّل لو الأدمن ما رفعش لوجو خاص بيه */
+function genericLogoSvg(size){
+  return `<svg viewBox="0 0 100 100" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100" height="100" rx="20" fill="var(--surface-2)" stroke="var(--gold)" stroke-width="3"/>
+    <g fill="var(--gold)">
+      <rect x="24" y="42" width="52" height="26" rx="13"/>
+      <circle cx="34" cy="55" r="6" fill="var(--bg)"/>
+      <rect x="46" y="52" width="4" height="10" fill="var(--bg)"/>
+      <rect x="42" y="55" width="12" height="4" fill="var(--bg)"/>
+      <circle cx="64" cy="50" r="4" fill="var(--bg)"/>
+      <circle cx="70" cy="58" r="4" fill="var(--bg)"/>
+    </g>
+  </svg>`;
+}
+function renderLogo(size){
+  if(state.branding && state.branding.logoDataUrl){
+    return `<img src="${state.branding.logoDataUrl}" alt="logo" style="width:${size}px;height:${size}px;border-radius:${Math.round(size*0.18)}px;object-fit:cover;border:2px solid var(--gold)">`;
+  }
+  return genericLogoSvg(size);
+}
+
+function renderLogin(){
+  const branch = currentBranch();
+  return `<div class="login-wrap"><div class="login-card">
+    ${renderLogo(126)}
+    <div class="brand-title">${esc(brandName())}</div>
+    <div class="brand-sub">نادي البلايستيشن${branch?` · ${esc(branch.name)}`:''}</div>
+    <form id="login-form">
+      <div class="field"><label>${esc(t('login_user'))}</label><input type="text" name="username" autocomplete="username" required></div>
+      <div class="field"><label>${esc(t('login_pass'))}</label><input type="password" name="password" autocomplete="current-password" required></div>
+      ${state.loginError ? `<div class="login-error">${esc(state.loginError)}</div>` : ''}
+      <button type="submit" class="btn btn-primary">${esc(t('login_btn'))}</button>
+    </form>
+    <div class="login-hint">أول تشغيل؟ استخدم admin / admin123 — وبعدها غيّر باسوردك من زرار "تغيير باسوردي" في القائمة</div>
+    <button class="btn btn-ghost btn-sm" id="change-branch-btn" style="width:100%;margin-top:12px">${esc(t('change_branch'))}</button>
+    <div style="display:flex;gap:8px;margin-top:10px;justify-content:center">
+      <button class="btn btn-ghost btn-sm" data-set-lang="ar" style="${state.lang==='ar'?'font-weight:900':''}">عربي</button>
+      <button class="btn btn-ghost btn-sm" data-set-lang="en" style="${state.lang==='en'?'font-weight:900':''}">EN</button>
+    </div>
+    ${renderFooter()}
+  </div></div>`;
+}
+function attachLoginEvents(){
+  document.querySelectorAll('[data-set-lang]').forEach(el=> el.addEventListener('click', ()=> setLang(el.getAttribute('data-set-lang'))));
+  const f = document.getElementById('login-form');
+  if(f) f.addEventListener('submit', e=>{
+    e.preventDefault();
+    const fd = new FormData(f);
+    doLogin(fd.get('username').trim(), fd.get('password'));
+  });
+  document.getElementById('change-branch-btn')?.addEventListener('click', leaveShop);
+}
+
+const NAV = [
+  {key:'shift', label:'الشفت', icon:'⏱️'},
+  {key:'devices', label:'الأجهزة', icon:'🎮'},
+  {key:'rooms', label:'رومز', icon:'🏠'},
+  {key:'drinks', label:'المشروبات', icon:'🥤'},
+  {key:'customers', label:'العملاء', icon:'🧑‍🤝‍🧑', adminOnly:true},
+  {key:'expenses', label:'بنود المصروفات', icon:'🧾', adminOnly:true},
+  {key:'staff', label:'الموظفون', icon:'🗝️', adminOnly:true},
+  {key:'history', label:'السجل', icon:'📜', adminOnly:true},
+  {key:'settings', label:'الإعدادات', icon:'⚙️', adminOnly:true},
+];
+function renderShell(){
+  const u = currentUser();
+  const nav = NAV.filter(n => !n.adminOnly || isAdmin());
+  return `<div class="shell">
+    <div class="scrim ${state.sidebarOpen?'show':''}" id="scrim"></div>
+    <div class="sidebar ${state.sidebarOpen?'open':''}" id="sidebar">
+      <div class="side-logo">${renderLogo(40)}<div><div class="t1">${esc(brandName())}</div><div class="t2">${esc(currentBranch()?.name || 'نادي البلايستيشن')}</div></div></div>
+      ${nav.map(n=>`<div class="nav-item ${state.view===n.key?'active':''}" data-nav="${n.key}"><span class="ic">${n.icon}</span><span>${esc(t('nav_'+n.key))}</span></div>`).join('')}
+      <div class="side-foot">
+        <div class="who">${u.role==='admin'?'مدير':'موظف'}: <b>${esc(u.name||u.username)}</b></div>
+        <button class="btn btn-ghost btn-sm" style="width:100%;margin-bottom:6px" id="change-pw-btn">🔑 ${esc(t('change_pw'))}</button>
+        <button class="btn btn-ghost btn-sm" style="width:100%;margin-bottom:6px" id="switch-branch-btn">${esc(t('switch_branch'))}</button>
+        <button class="btn btn-ghost btn-sm" style="width:100%" id="logout-btn">${esc(t('logout'))}</button>
+      </div>
+    </div>
+    <div class="main">
+      <div class="mobile-topbar">
+        <button class="burger" id="burger-btn">☰</button>
+        <div style="display:flex;align-items:center;gap:8px">${renderLogo(30)}<b>${esc(brandName())}</b></div>
+        <span></span>
+      </div>
+      ${renderView()}
+      ${renderFooter()}
+    </div>
+  </div>${renderModals()}`;
+}
+function renderView(){
+  if(state.view==='shift') return renderShiftView();
+  if(state.view==='devices') return renderStationsView('device');
+  if(state.view==='rooms') return renderStationsView('room');
+  if(state.view==='drinks') return renderDrinksView();
+  if(state.view==='customers') return renderCustomersView();
+  if(state.view==='expenses') return renderExpenseCatView();
+  if(state.view==='staff') return renderStaffView();
+  if(state.view==='history') return renderHistoryView();
+  if(state.view==='settings') return renderSettingsView();
+  return '';
+}
+function renderSettingsView(){
+  const branchRows = state.branches.map(b=>`
+    <div class="row-item" style="gap:8px">
+      <input class="rate-input" style="flex:1" id="branch-name-${b.id}" value="${esc(b.name)}">
+      <button class="btn btn-primary btn-sm" data-save-branch="${b.id}">حفظ</button>
+      <button class="btn btn-danger btn-sm" data-del-station-branch="${b.id}">حذف</button>
+    </div>`).join('');
+  const themeSwatches = THEMES.map(th=>`
+    <button class="theme-swatch ${state.branding.theme===th.key?'sel':''}" data-pick-theme="${th.key}" title="${esc(th.name)}"
+      style="background:${th.bg};border-color:${th.gold}">
+      <span style="background:${th.blau}"></span><span style="background:${th.grana}"></span><span style="background:${th.gold}"></span>
+    </button>`).join('');
+  return `<div class="topbar"><div><h2 class="page-title">${t('settings_title')}</h2>
+    <div class="page-sub">شعار النادي، الفروع، الثيم، واللغة</div></div></div>
+
+    <div class="section-head"><h3>${t('settings_club_name')} و${t('settings_logo')}</h3></div>
+    <div class="form-card">
+      <div class="field"><label>${t('settings_club_name')}</label>
+        <input id="app-name-input" type="text" value="${esc(state.branding.appName||'')}" placeholder="نادي البلايستيشن"></div>
+      <div style="display:flex;align-items:center;gap:16px;margin-top:12px">
+        ${renderLogo(72)}
+        <label class="btn btn-ghost btn-sm" style="cursor:pointer">${t('settings_upload')}<input id="logo-upload-input" type="file" accept="image/*" style="display:none"></label>
+      </div>
+      <button class="btn btn-primary" id="save-appname-btn" style="width:100%;margin-top:14px">${t('settings_save')}</button>
+    </div>
+
+    <div class="section-head"><h3>${t('settings_branches')}</h3><button class="btn btn-gold btn-sm" id="add-branch-btn">+ فرع جديد</button></div>
+    <div class="list-card">${branchRows || `<div class="empty-state">لا توجد فروع بعد</div>`}</div>
+
+    <div class="section-head"><h3>${t('settings_theme')} (${THEMES.length})</h3></div>
+    <div class="theme-grid">${themeSwatches}</div>
+
+    <div class="section-head"><h3>${t('settings_lang')}</h3></div>
+    <div class="form-card" style="display:flex;gap:10px">
+      <button class="btn ${state.lang==='ar'?'btn-primary':'btn-ghost'} btn-sm" style="flex:1" data-set-lang="ar">العربية</button>
+      <button class="btn ${state.lang==='en'?'btn-primary':'btn-ghost'} btn-sm" style="flex:1" data-set-lang="en">English</button>
+    </div>`;
+}
+function attachSettingsEvents(){
+  document.getElementById('save-appname-btn')?.addEventListener('click', ()=>{
+    const v = document.getElementById('app-name-input').value.trim();
+    state.branding.appName = v || null;
+    saveBrandingField('appName', v || null);
+    document.title = brandName();
+    render();
+  });
+  document.getElementById('logo-upload-input')?.addEventListener('change', (e)=>{
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = ev => { img.onload = ()=>{
+      // نصغّر الصورة قبل الحفظ عشان الملف يفضل خفيف
+      const maxSide = 240;
+      const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(img.width*scale); canvas.height = Math.round(img.height*scale);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/png', 0.85);
+      state.branding.logoDataUrl = dataUrl;
+      saveBrandingField('logoDataUrl', dataUrl);
+      render();
+    }; img.src = ev.target.result; };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('add-branch-btn')?.addEventListener('click', ()=>{
+    askInput('فرع جديد', [{key:'name', label:'اسم الفرع', type:'text', value:''}], 'add-branch', {});
+  });
+  document.querySelectorAll('[data-save-branch]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const id = el.getAttribute('data-save-branch');
+      const v = document.getElementById('branch-name-'+id).value;
+      renameBranch(id, v);
+    });
+  });
+  document.querySelectorAll('[data-del-station-branch]').forEach(el=>{
+    el.addEventListener('click', ()=> deleteBranch(el.getAttribute('data-del-station-branch')));
+  });
+  document.querySelectorAll('[data-pick-theme]').forEach(el=>{
+    el.addEventListener('click', ()=>{ applyTheme(el.getAttribute('data-pick-theme')); render(); });
+  });
+  document.querySelectorAll('[data-set-lang]').forEach(el=>{
+    el.addEventListener('click', ()=> setLang(el.getAttribute('data-set-lang')));
+  });
+}
+/* فوتر ثابت أسفل كل صفحة */
+function renderFooter(){ return `<div class="app-footer">Made by <b>Mohamed Gaber</b></div>`; }
+
+function renderShiftView(){
+  const shift = openShift();
+  if(!shift){
+    return `<div class="topbar"><div><h2 class="page-title">الشفت</h2><div class="page-sub">ابدأ شفتًا جديدًا لتسجيل الجلسات والمشروبات والمصروفات</div></div></div>
+    <div class="shift-hero closed" style="text-align:center;">
+      <div style="font-size:15px;color:var(--text-dim);margin-bottom:14px">لا يوجد شفت مفتوح حاليًا</div>
+      <button class="btn btn-primary" id="start-shift-btn" style="max-width:220px;margin:0 auto">بدء الشفت الآن</button>
+    </div>`;
+  }
+  const mins = minutesBetween(shift.startTime, nowIso());
+  const live = buildBreakdownFor(shift.id);
+  const expRows = state.expenses.filter(e=>e.shiftId===shift.id).map(e=>`
+    <div class="exp-line">
+      <span>${esc(e.categoryName)} ${e.note?`<span style="color:var(--text-dim)">— ${esc(e.note)}</span>`:''}</span>
+      <span style="display:flex;align-items:center;gap:8px"><b class="num">${money(e.amount)} ج.م</b>
+      ${isAdmin()?`<button class="btn btn-ghost btn-sm" data-del-expense="${e.id}" style="padding:3px 8px">✕</button>`:''}</span>
+    </div>`).join('');
+  const directSales = state.drinkSales.filter(s => s.shiftId === shift.id).sort((a,b)=> new Date(b.time) - new Date(a.time));
+  const salesRows = directSales.map(s => `
+    <div class="exp-line">
+      <span>${esc(s.drinkName)} × ${s.qty} <span style="color:var(--text-dim)">— ${esc(s.soldByName)}</span></span>
+      <span style="display:flex;align-items:center;gap:8px"><b class="num" style="color:var(--gold)">${money(s.total)} ج.م</b>
+      ${isAdmin()?`<button class="btn btn-ghost btn-sm" data-del-sale="${s.id}" style="padding:3px 8px" title="حذف وإرجاع المخزون">✕</button>`:''}</span>
+    </div>`).join('');
+  return `<div class="topbar"><div><h2 class="page-title">الشفت الحالي</h2><div class="page-sub">فتحه ${esc(shift.openedByName)} — ${fmtDateTime(shift.startTime)}</div></div>
+    <span class="badge-status open">مفتوح</span></div>
+    <div class="shift-hero">
+      <div class="kv-row" style="border:none"><span class="k">مدة الشفت</span><span class="v num" id="shift-timer" data-start="${shift.startTime}">${fmtDuration(mins)}</span></div>
+      <div class="shift-stats">
+        <div class="stat-box pos"><div class="lbl">إيراد الأجهزة</div><div class="val num">${money(live.deviceRevenue)}</div></div>
+        <div class="stat-box pos"><div class="lbl">إيراد المشروبات</div><div class="val num">${money(live.drinksRevenue)}</div></div>
+        <div class="stat-box neg"><div class="lbl">المصروفات</div><div class="val num">${money(live.expensesTotal)}</div></div>
+        <div class="stat-box net"><div class="lbl">الصافي حتى الآن</div><div class="val num">${money(live.netTotal)}</div></div>
+      </div>
+    </div>
+    ${directSales.length ? `
+      <div class="section-head"><h3>المبيعات المباشرة (بدون جلسة)</h3><span class="stock-badge">${directSales.length} عملية</span></div>
+      <div class="list-card" style="padding:4px 16px">${salesRows}</div>
+    ` : ''}
+    <div class="section-head"><h3>المصروفات المسجّلة هذا الشفت</h3><button class="btn btn-gold btn-sm" id="open-expense-modal">+ تسجيل مصروف</button></div>
+    <div class="list-card">${expRows || `<div class="empty-state">لا توجد مصروفات مسجّلة بعد</div>`}</div>
+    <div class="section-head"><h3>إنهاء الشفت</h3></div>
+    <div class="form-card">
+      <p style="color:var(--text-dim);font-size:13px;margin:0 0 12px">عند الإنهاء سيتم احتساب كل الأجهزة والمشروبات والمصروفات وعرض تقرير كامل.</p>
+      <button class="btn btn-grana" id="end-shift-btn" style="width:100%">إنهاء الشفت وعرض التقرير</button>
+    </div>`;
+}
+
+function sessionTimerDisplay(session, mins){
+  const planned = Number(session.plannedMinutes)||0;
+  if(session.billingType === 'time' && planned>0){
+    const remaining = planned - mins;
+    return remaining >= 0 ? fmtDuration(remaining) : ('+'+fmtDuration(mins-planned));
+  }
+  return fmtDuration(mins);
+}
+function pricesSummary(device, kind, mode){
+  const p = getPrices(device, kind, mode);
+  return `${money(p.q)}/${money(p.h)}/${money(p.hr)}`;
+}
+function renderStationsView(category){
+  const isRoom = category === 'room';
+  const title = isRoom ? 'رومز' : 'الأجهزة';
+  const singular = isRoom ? 'روم' : 'جهاز';
+  const shiftOpen = !!openShift();
+  const items = state.devices.filter(d => (d.category||'device') === category)
+    .sort((a,b)=> extractNum(a.name) - extractNum(b.name));
+  const cards = items.map(d => {
+    const active = d.status === 'active';
+    const session = active ? activeSessionFor(d.id) : null;
+    const mins = (active && session) ? minutesBetween(session.startTime, nowIso()) : 0;
+    const isTime = active && session && session.billingType === 'time';
+    const liveCost = active && session ? computeSessionTimeCost(session, nowIso()) + (session.drinksCost||0) : 0;
+    return `<div class="card device-card ${active?'active':'idle'}" data-open-station="${d.id}">
+      <div class="dev-head"><div class="dev-name">${esc(d.name)}</div>${active?`<span class="dev-type">${esc(sessionKind(session))}${isTime?' · تايم':' · أوبن'}</span>`:''}</div>
+      <div class="dev-status-label"><span class="status-dot ${active?'active':'idle'}"></span>${active?'مشغول الآن':'متاح'}</div>
+      ${active
+        ? `<div class="dev-mode-tag">${esc(sessionKind(session))} · <b>${esc(MODE_LABEL[session?.mode]||'')}</b> · العميل: ${esc(session?.customerName||'')}</div>
+           <div class="dev-timer num" id="timer-${d.id}">${sessionTimerDisplay(session, mins)}</div>
+           <div class="dev-cost num" id="cost-${d.id}">${money(liveCost)} ج.م</div>
+           <button class="btn btn-grana btn-sm" style="width:100%">فتح الجلسة</button>`
+        : `<div class="dev-rates">PS4 ربع/نص/س: <span>${pricesSummary(d,'PS4','solo')}</span> · PS5: <span>${pricesSummary(d,'PS5','solo')}</span> ج.م</div>
+           <button class="btn btn-primary btn-sm" style="width:100%" data-quick-start="${d.id}" ${shiftOpen?'':'disabled'}>${shiftOpen?'بدء جلسة':'افتح الشفت أولاً'}</button>`}
+    </div>`;
+  }).join('');
+  const adminBlock = (isAdmin() && items.length) ? `
+    <div class="section-head"><h3>تعديل الأسعار (ربع / نص / ساعة)</h3></div>
+    <div class="list-card">
+      ${items.map(d=>`
+        <div class="row-item" style="flex-direction:column;align-items:stretch">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <div class="row-avatar" style="width:32px;height:32px;font-size:14px">${isRoom?'🏠':'🎮'}</div>
+            <div class="row-title">${esc(d.name)}</div>
+            <button class="btn btn-danger btn-sm" data-del-station="${d.id}" style="margin-right:auto">حذف</button>
+          </div>
+          ${KINDS.map(k=>`
+            <div style="font-weight:700;font-size:12px;margin:6px 0 2px;color:var(--gold)">${k}</div>
+            <div class="price-grid">
+              <span class="lbl"></span><span class="h">ربع (15د)</span><span class="h">نص (30د)</span><span class="h">ساعة</span>
+              ${MODES.map(m=>{
+                const p = getPrices(d, k, m);
+                return `<span class="lbl">${MODE_LABEL[m]}</span>
+                  <input class="rate-input num" id="sp-${d.id}-${k}-${m}-q" type="number" value="${p.q}" data-sprice="${d.id}" data-kind="${k}" data-mode="${m}" data-field="q">
+                  <input class="rate-input num" id="sp-${d.id}-${k}-${m}-h" type="number" value="${p.h}" data-sprice="${d.id}" data-kind="${k}" data-mode="${m}" data-field="h">
+                  <input class="rate-input num" id="sp-${d.id}-${k}-${m}-hr" type="number" value="${p.hr}" data-sprice="${d.id}" data-kind="${k}" data-mode="${m}" data-field="hr">`;
+              }).join('')}
+            </div>`).join('')}
+        </div>`).join('')}
+    </div>` : '';
+  return `<div class="topbar"><div><h2 class="page-title">${title}</h2>
+    <div class="page-sub">${items.filter(d=>d.status==='active').length} جلسة نشطة من ${items.length}</div></div></div>
+    ${isAdmin() ? `<div class="card" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+      <div><div style="font-weight:800;font-size:14px">عدد ${title}</div>
+      <div style="font-size:12px;color:var(--text-dim)">زوّد أو قلّل حسب اللي موجود فعليًا في المحل</div></div>
+      <div class="qty-ctl">
+        <button data-station-count="-1" data-category="${category}" style="width:36px;height:36px;font-size:18px">−</button>
+        <span class="num" style="min-width:30px;text-align:center;font-size:19px;font-weight:800">${items.length}</span>
+        <button data-station-count="1" data-category="${category}" style="width:36px;height:36px;font-size:18px">+</button>
+      </div>
+    </div>` : ''}
+    ${!shiftOpen ? `<div class="form-card" style="border-color:var(--gold);margin-bottom:16px">افتح الشفت من صفحة "الشفت" لتتمكن من بدء أي جلسة.</div>` : ''}
+    <div class="grid">${cards || `<div class="empty-state">لا توجد ${isRoom?'رومز':'أجهزة'} بعد${isAdmin()?` — استخدم زر + بالأعلى لإضافة أول ${singular}`:''}</div>`}</div>
+    ${adminBlock}`;
+}
+
+function renderCustomersView(){
+  const rows = state.customers.map(c => `
+    <div class="row-item" style="flex-wrap:wrap">
+      <div class="row-avatar">${esc((c.name||'?')[0])}</div>
+      <div class="row-main">
+        <div class="row-title">${esc(c.name)} ${c.useCustomRate ? `<span class="badge-role admin">سعر خاص</span>` : `<span class="badge-role">سعر عادي</span>`}</div>
+        <div class="row-sub">${c.phone?esc(c.phone):'بدون رقم'}${c.dob?' · مواليد '+esc(c.dob):''}</div>
+      </div>
+      <div class="row-actions">
+        <button class="btn btn-ghost btn-sm" data-edit-customer="${c.id}">تعديل البيانات</button>
+        <button class="btn btn-danger btn-sm" data-del-customer="${c.id}">حذف</button>
+      </div>
+      <div class="row-actions" style="width:100%;justify-content:flex-start;margin-top:6px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-dim);cursor:pointer">
+          <input type="checkbox" data-rate-toggle="${c.id}" ${c.useCustomRate?'checked':''} style="width:16px;height:16px">
+          تفعيل سعر خاص (عضوية)
+        </label>
+      </div>
+      <div class="row-actions" style="width:100%;justify-content:flex-start">
+        <span style="font-size:11px;color:var(--text-dim)">سعر الساعة الخاص</span>
+        <input class="rate-input num" id="rate-${c.id}" type="number" value="${c.hourlyRate||0}" data-rate-for="${c.id}" ${c.useCustomRate?'':'disabled'}>
+        <span style="font-size:11px;color:var(--text-dim);margin-right:10px">الرصيد</span>
+        <input class="rate-input num" id="bal-${c.id}" type="number" value="${c.balance||0}" data-balance-for="${c.id}">
+      </div>
+    </div>`).join('');
+  return `<div class="topbar"><div><h2 class="page-title">العملاء</h2><div class="page-sub">سعر خاص عند تفعيله يستبدل كل أسعار الجهاز (الربع/النص/الساعة)</div></div></div>
+    <div class="list-card">${rows || `<div class="empty-state">لا يوجد عملاء مسجّلون بعد</div>`}</div>
+    <div class="form-card">
+      <div class="form-grid">
+        <div class="field"><label>اسم العميل</label><input id="nc-name" placeholder="محمد أحمد"></div>
+        <div class="field"><label>رقم الهاتف</label><input id="nc-phone" placeholder="01xxxxxxxxx"></div>
+        <div class="field"><label>تاريخ الميلاد</label><input id="nc-dob" type="date"></div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label>مبلغ التسجيل (الرصيد)</label><input id="nc-balance" type="number" placeholder="100"></div>
+        <div class="field"><label>سعر الساعة الخاص</label><input id="nc-rate" type="number" placeholder="20"></div>
+      </div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;margin-bottom:12px;cursor:pointer">
+        <input type="checkbox" id="nc-use-custom" style="width:16px;height:16px"> تفعيل السعر الخاص لهذا العميل (عضوية)
+      </label>
+      <button class="btn btn-primary btn-sm" id="save-customer-btn">+ إضافة عميل</button>
+    </div>`;
+}
+
+function renderDrinksView(){
+  const admin = isAdmin();
+  const rows = state.drinks.map(d => `
+    <div class="row-item">
+      <div class="row-avatar">${d.imageUrl?`<img src="${esc(d.imageUrl)}" onerror="this.style.display='none'">`:'🥤'}</div>
+      <div class="row-main">
+        <div class="row-title">${esc(d.name)}</div>
+        <div class="row-sub">${money(d.price)} ج.م</div>
+      </div>
+      <div class="row-actions">
+        <span class="stock-badge ${d.stock<=LOW_STOCK_THRESHOLD?'low':''}">مخزون: ${d.stock}</span>
+        <button class="btn btn-gold btn-sm" data-sell-drink="${d.id}" ${d.stock<1?'disabled':''}>💰 بيع</button>
+        ${admin ? `
+          <button class="btn btn-ghost btn-sm" data-edit-drink="${d.id}">تعديل</button>
+          <button class="btn btn-danger btn-sm" data-del-drink="${d.id}">حذف</button>
+        ` : ''}
+      </div>
+    </div>`).join('');
+  const adminForm = admin ? `
+    <div class="form-card">
+      <div style="font-weight:800;font-size:14px;margin-bottom:10px">إضافة مشروب جديد</div>
+      <div class="form-grid">
+        <div class="field"><label>اسم المشروب</label><input id="ndr-name" placeholder="بيبسي"></div>
+        <div class="field"><label>السعر</label><input id="ndr-price" type="number" placeholder="15"></div>
+        <div class="field"><label>الكمية بالمخزون</label><input id="ndr-stock" type="number" placeholder="20"></div>
+        <div class="field"><label>رابط صورة (اختياري)</label><input id="ndr-image" placeholder="https://..."></div>
+      </div>
+      <button class="btn btn-primary btn-sm" id="save-drink-btn">+ إضافة مشروب</button>
+    </div>` : '';
+  const shiftOpen = !!openShift();
+  const shiftHint = !shiftOpen ? `<div class="form-card" style="border-color:var(--gold);margin-bottom:16px;font-size:13px">مفيش شفت مفتوح — البيع هيخصم من المخزون بس مش هيتسجل في تقرير الشفت.</div>` : '';
+  const lowStock = state.drinks.filter(d => (Number(d.stock)||0) <= LOW_STOCK_THRESHOLD);
+  const lowBanner = lowStock.length ? `<div class="form-card" style="border-color:${lowStock.some(d=>(Number(d.stock)||0)===0)?'var(--danger)':'var(--gold)'};margin-bottom:16px">
+    <div style="font-weight:800;font-size:13px;margin-bottom:6px">⚠️ تنبيه مخزون منخفض</div>
+    ${lowStock.map(d=>`<div class="exp-line"><span>${esc(d.name)}</span><b class="num" style="color:${(Number(d.stock)||0)===0?'var(--danger)':'var(--gold)'}">${(Number(d.stock)||0)===0?'نفذ تمامًا!':(Number(d.stock)||0)+' متبقي'}</b></div>`).join('')}
+  </div>` : '';
+  return `<div class="topbar"><div><h2 class="page-title">المشروبات</h2><div class="page-sub">${admin?'إدارة القائمة والمخزون':'اضغط "بيع" لبيع مشروب وطباعة الفاتورة'}</div></div></div>
+    ${shiftHint}
+    ${lowBanner}
+    <div class="list-card">${rows || `<div class="empty-state">لا توجد مشروبات مضافة بعد</div>`}</div>
+    ${adminForm}`;
+}
+
+function renderExpenseCatView(){
+  const rows = state.expenseCategories.map(c => `
+    <div class="row-item">
+      <div class="row-avatar">🧾</div>
+      <div class="row-main"><div class="row-title">${esc(c.name)}</div></div>
+      <div class="row-actions"><button class="btn btn-danger btn-sm" data-del-expcat="${c.id}">حذف</button></div>
+    </div>`).join('');
+  return `<div class="topbar"><div><h2 class="page-title">بنود المصروفات</h2><div class="page-sub">الأنواع التي يختار منها الموظف عند تسجيل مصروف</div></div></div>
+    <div class="list-card">${rows || `<div class="empty-state">لا توجد بنود مصروفات بعد</div>`}</div>
+    <div class="form-card">
+      <div class="form-grid">
+        <div class="field"><label>اسم البند</label><input id="nexp-name" placeholder="كهرباء"></div>
+      </div>
+      <button class="btn btn-primary btn-sm" id="save-expcat-btn">+ إضافة بند</button>
+    </div>`;
+}
+
+function renderStaffView(){
+  // حساب المدير الرئيسي (admin) مخفي ومحمي — لا يظهر ولا يمكن حذفه
+  const visible = state.users.filter(u => u.username !== 'admin' && !u.protected);
+  const rows = visible.map(u => `
+    <div class="row-item">
+      <div class="row-avatar">${esc((u.name||u.username||'?')[0])}</div>
+      <div class="row-main"><div class="row-title">${esc(u.name||u.username)} <span class="badge-role ${u.role}">${u.role==='admin'?'مدير':'موظف'}</span></div><div class="row-sub">@${esc(u.username)}</div></div>
+      <div class="row-actions">
+        <button class="btn btn-ghost btn-sm" data-edit-staff="${u.id}">تعديل</button>
+        <button class="btn btn-danger btn-sm" data-del-staff="${u.id}">حذف</button>
+      </div>
+    </div>`).join('');
+  return `<div class="topbar"><div><h2 class="page-title">الموظفون</h2><div class="page-sub">حسابات الموظفين خاصة بكل فرع — حساب الأدمن الرئيسي وحده المشترك بين كل الفروع</div></div></div>
+    <div class="list-card">${rows || `<div class="empty-state">لا يوجد موظفون مسجلون</div>`}</div>
+    <div class="form-card">
+      <div class="form-grid">
+        <div class="field"><label>اسم المستخدم</label><input id="ns-username" placeholder="ahmed"></div>
+        <div class="field"><label>كلمة المرور</label><input id="ns-password" placeholder="••••"></div>
+        <div class="field"><label>الاسم</label><input id="ns-name" placeholder="أحمد"></div>
+        <div class="field"><label>الصلاحية</label><select id="ns-role"><option value="staff">موظف</option><option value="admin">مدير</option></select></div>
+      </div>
+      <button class="btn btn-primary btn-sm" id="save-staff-btn">+ إضافة حساب</button>
+    </div>
+    <p style="font-size:11px;color:var(--text-dim);margin-top:12px">🔒 حساب المدير الرئيسي (admin) مخفي ومحمي — تقدر تغيّر باسوردك من زرار "تغيير باسوردي" في القائمة الجانبية.</p>`;
+}
+
+function exportHistoryCsv(){
+  const from = state.historyFrom, to = state.historyTo;
+  if(state.historyTab === 'shifts'){
+    const rows = state.shifts
+      .filter(s=>s.status==='closed' && inDateRange(s.startTime, from, to))
+      .sort((a,b)=> new Date(b.startTime)-new Date(a.startTime))
+      .map(s=>[s.openedByName||'', fmtDateTime(s.startTime), fmtDateTime(s.endTime), s.deviceRevenue||0, s.drinksRevenue||0, s.expensesTotal||0, s.netTotal||0]);
+    exportCsv('shifts.csv', ['فتحه','البداية','الإغلاق','إيراد الأجهزة','إيراد المشروبات','المصروفات','الصافي'], rows);
+  } else if(state.historyTab === 'sessions'){
+    const rows = state.sessions
+      .filter(s => s.status==='closed' && inDateRange(s.startTime, from, to))
+      .sort((a,b)=> new Date(b.startTime)-new Date(a.startTime))
+      .map(s=>[s.deviceName||'', sessionKind(s), MODE_LABEL[s.mode]||s.mode||'', s.customerName||'زائر',
+        Math.round(minutesBetween(s.startTime, s.endTime)), fmtDateTime(s.endTime),
+        s.timeCost||0, s.drinksCost||0, s.discount||0, s.total||0]);
+    exportCsv('sessions.csv', ['الجهاز','النوع','النمط','العميل','المدة بالدقائق','الإغلاق','الوقت','المشروبات','الخصم','الإجمالي'], rows);
+  } else {
+    const rows = state.drinkSales
+      .filter(s => inDateRange(s.time, from, to))
+      .sort((a,b)=> new Date(b.time)-new Date(a.time))
+      .map(s=>[s.drinkName||'', s.qty, s.price, s.total, s.soldByName||'', fmtDateTime(s.time)]);
+    exportCsv('sales.csv', ['الصنف','الكمية','السعر','الإجمالي','الموظف','الوقت'], rows);
+  }
+}
+
+function renderHistoryView(){
+  const from = state.historyFrom, to = state.historyTo;
+  const closedShifts = state.shifts.filter(s=>s.status==='closed' && inDateRange(s.startTime, from, to))
+    .sort((a,b)=> new Date(b.startTime)-new Date(a.startTime));
+  const closedSessions = state.sessions.filter(s => s.status === 'closed' && inDateRange(s.startTime, from, to))
+    .sort((a,b)=> new Date(b.startTime) - new Date(a.startTime));
+  const allSales = state.drinkSales.filter(s => inDateRange(s.time, from, to))
+    .sort((a,b)=> new Date(b.time) - new Date(a.time));
+  const shiftRows = closedShifts.map(s=>`
+    <tr class="link-row" data-view-shift="${s.id}">
+      <td>${esc(s.openedByName)}</td><td>${fmtDateTime(s.startTime)}</td>
+      <td>${fmtDateTime(s.endTime)}</td>
+      <td class="num" style="color:var(--gold);font-weight:700">${money(s.netTotal)} ج.م</td>
+    </tr>`).join('');
+  const sessionRows = closedSessions.map(s => `
+    <tr class="link-row" data-view-receipt="${s.id}">
+      <td>${esc(s.deviceName)} <span class="dev-type">${esc(sessionKind(s))} / ${esc(MODE_LABEL[s.mode]||'')}</span></td>
+      <td>${esc(s.customerName||'زائر')}</td>
+      <td class="num">${fmtDuration(minutesBetween(s.startTime, s.endTime))}</td>
+      <td>${fmtDateTime(s.endTime)}</td>
+      <td class="num" style="color:var(--gold);font-weight:700">${money(s.total)} ج.م</td>
+    </tr>`).join('');
+  const saleRows = allSales.map(s => `
+    <tr>
+      <td>${esc(s.drinkName)}</td>
+      <td class="num">${s.qty}</td>
+      <td>${esc(s.soldByName||'—')}</td>
+      <td>${fmtDateTime(s.time)}</td>
+      <td class="num" style="color:var(--gold);font-weight:700">${money(s.total)} ج.م</td>
+      <td>${isAdmin()?`<button class="btn btn-ghost btn-sm" data-del-sale="${s.id}" style="padding:3px 8px" title="حذف وإرجاع المخزون">✕</button>`:''}</td>
+    </tr>`).join('');
+  const olderBtn = state.hasMoreClosedSessions && state.historyTab==='sessions' ? `
+    <div style="text-align:center;margin:14px 0">
+      <button class="btn btn-ghost btn-sm" id="load-older-btn" ${state.loadingOlderSessions?'disabled':''}>
+        ${state.loadingOlderSessions?'جارٍ التحميل...':'تحميل جلسات أقدم'}
+      </button>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px">معروض حاليًا ${closedSessions.length} جلسة</div>
+    </div>` : '';
+  let body = '';
+  if(state.historyTab==='shifts'){
+    body = `<div class="list-card table-wrap"><table class="plain">
+      <thead><tr><th>فتحه</th><th>البداية</th><th>الإغلاق</th><th>الصافي</th></tr></thead>
+      <tbody>${shiftRows || `<tr><td colspan="4" class="empty-state">لا توجد شفتات منتهية في هذا النطاق</td></tr>`}</tbody>
+    </table></div>`;
+  } else if(state.historyTab==='sessions'){
+    body = `<div class="list-card table-wrap"><table class="plain">
+      <thead><tr><th>الجهاز</th><th>العميل</th><th>المدة</th><th>الإغلاق</th><th>الإجمالي</th></tr></thead>
+      <tbody>${sessionRows || `<tr><td colspan="5" class="empty-state">لا توجد جلسات منتهية في هذا النطاق</td></tr>`}</tbody>
+    </table></div>${olderBtn}`;
+  } else {
+    body = `<div class="list-card table-wrap"><table class="plain">
+      <thead><tr><th>الصنف</th><th>الكمية</th><th>الموظف</th><th>الوقت</th><th>الإجمالي</th>${isAdmin()?'<th></th>':''}</tr></thead>
+      <tbody>${saleRows || `<tr><td colspan="6" class="empty-state">لا توجد مبيعات مباشرة في هذا النطاق</td></tr>`}</tbody>
+    </table></div>`;
+  }
+  return `<div class="topbar"><div><h2 class="page-title">السجل</h2><div class="page-sub">الشفتات والجلسات والمبيعات السابقة</div></div></div>
+    <div class="card" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px">
+      <div class="field" style="margin:0;flex:1;min-width:130px"><label>من تاريخ</label><input type="date" id="hist-from" value="${esc(state.historyFrom)}"></div>
+      <div class="field" style="margin:0;flex:1;min-width:130px"><label>إلى تاريخ</label><input type="date" id="hist-to" value="${esc(state.historyTo)}"></div>
+      <button class="btn btn-ghost btn-sm" id="hist-clear">مسح الفلتر</button>
+      <button class="btn btn-gold btn-sm" id="hist-export">⬇️ تصدير CSV</button>
+    </div>
+    <div class="tabs2">
+      <div class="tab2 ${state.historyTab==='shifts'?'active':''}" data-htab="shifts">الشفتات (${closedShifts.length})</div>
+      <div class="tab2 ${state.historyTab==='sessions'?'active':''}" data-htab="sessions">الجلسات (${closedSessions.length})</div>
+      <div class="tab2 ${state.historyTab==='sales'?'active':''}" data-htab="sales">المبيعات المباشرة (${allSales.length})</div>
+    </div>
+    ${body}`;
+}
+
+/* ---------- Modals ---------- */
+function renderModals(){
+  let html = '';
+  if(state.openDeviceId){
+    const device = state.devices.find(d => d.id === state.openDeviceId);
+    if(device) html += device.status === 'idle' ? renderStartModal(device) : renderSessionModal(device);
+  }
+  if(state.expenseModalOpen) html += renderExpenseModal();
+  if(state.receiptSession) html += renderReceiptModal(state.receiptSession);
+  if(state.reportShift) html += renderShiftReportModal(state.reportShift);
+  if(state.sellModal) html += renderSellModal();
+  if(state.saleReceipt) html += renderSaleReceiptModal(state.saleReceipt);
+  if(state.staffEditId) html += renderStaffEditModal();
+  return html;
+}
+function renderStartModal(device){
+  const opts = state.customers.map(c => `<option value="${c.id}" ${state.startCustomerId===c.id?'selected':''}>${esc(c.name)} — ${c.useCustomRate?`سعر خاص ${money(c.hourlyRate)} ج.م/س`:'سعر عادي'} · رصيد ${money(c.balance||0)} ج.م</option>`).join('');
+  const kind = state.startKind || 'PS5';
+  const mode = state.startMode || 'solo';
+  const billing = state.startBillingType || 'open';
+  const selectedCustomer = state.startCustomerId ? state.customers.find(c=>c.id===state.startCustomerId) : null;
+  const prices = resolvePrices(selectedCustomer, device, kind, mode);
+  const amount = state.startPrepaidAmount || 0;
+  const plannedMins = (billing==='time' && amount>0) ? minutesForAmount(prices, amount) : 0;
+  const amountChips = [5,10,15,20,25,30,40,50,75,100];
+  return `<div class="modal-scrim" data-close-modal="1"><div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head"><h3 class="modal-title">بدء جلسة<small>${esc(device.name)}</small></h3>
+      <button class="modal-close" data-close-modal="1">✕</button></div>
+    <div class="field"><label>نوع الجهاز</label></div>
+    <div class="mode-choice" style="grid-template-columns:repeat(2,1fr)">
+      ${KINDS.map(k=>`<div class="mode-chip ${kind===k?'sel':''}" data-pick-kind="${k}"><span class="lbl">${k}</span></div>`).join('')}
+    </div>
+    <div class="field"><label>عدد الدراعات</label></div>
+    <div class="mode-choice">
+      ${MODES.map(m=>{
+        const p = resolvePrices(selectedCustomer, device, kind, m);
+        return `<div class="mode-chip ${mode===m?'sel':''}" data-pick-mode="${m}">
+          <span class="lbl">${MODE_LABEL[m]}</span>
+          <span class="pr num">${money(p.q)}/${money(p.h)}/${money(p.hr)}</span>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="field"><label>نوع الجلسة</label></div>
+    <div class="mode-choice" style="grid-template-columns:repeat(2,1fr)">
+      <div class="mode-chip ${billing==='time'?'sel':''}" data-pick-billing="time"><span class="lbl">تايم ⏱️</span><span class="pr">عد تنازلي</span></div>
+      <div class="mode-chip ${billing==='open'?'sel':''}" data-pick-billing="open"><span class="lbl">أوبن ▶️</span><span class="pr">عد تصاعدي</span></div>
+    </div>
+    ${billing==='time' ? `
+      <div class="field"><label>المبلغ (أقل من ${money(prices.q)} ج.م غير مقبول)</label></div>
+      <div class="mode-choice" style="grid-template-columns:repeat(5,1fr);gap:6px">
+        ${amountChips.map(a=>`<div class="mode-chip ${amount===a?'sel':''}" data-pick-amount="${a}" style="padding:9px 4px"><span class="lbl num">${a}</span></div>`).join('')}
+      </div>
+      <div class="kv-row" style="border:none"><span class="k">المدة المقابلة</span><span class="v num">${amount>0?(plannedMins>0?fmtDuration(plannedMins):'أقل من الربع — غير مقبول'):'اختر مبلغًا'}</span></div>
+    ` : ''}
+    <div class="field"><label>العميل (اختياري)</label>
+      <select id="start-customer"><option value="" ${!state.startCustomerId?'selected':''}>زائر بدون حساب</option>${opts}</select>
+    </div>
+    <button class="btn btn-primary" id="confirm-start-btn" style="width:100%" ${billing==='time' && (amount<=0 || plannedMins<=0) ? 'disabled':''}>بدء الجلسة الآن</button>
+  </div></div>`;
+}
+function renderSessionModal(device){
+  const session = activeSessionFor(device.id);
+  if(!session) return `<div class="modal-scrim" data-close-modal="1"><div class="modal"><div class="empty-state">تعذر تحميل بيانات الجلسة</div></div></div>`;
+  const isTime = session.billingType === 'time';
+  const mins = minutesBetween(session.startTime, nowIso());
+  const segs = getSegments(session);
+  const curSeg = segs[segs.length-1];
+  const timeCost = computeSessionTimeCost(session, nowIso());
+  const drinksCost = (session.drinks||[]).reduce((a,x)=>a+x.qty*x.price,0);
+  const discount = isAdmin() ? Math.min(Math.max(0, Number(state.closeDiscount)||0), timeCost + drinksCost) : 0;
+  const total = Math.max(0, timeCost + drinksCost - discount);
+  const prepaidNow = isTime ? (Number(session.prepaidAmount)||0) : 0;
+  const dueAfterPrepaid = Math.max(0, total - prepaidNow);
+  const customer = session.customerId ? state.customers.find(c=>c.id===session.customerId) : null;
+  const balanceNow = customer ? (Number(customer.balance)||0) : 0;
+  const projectedBalance = Math.max(0, balanceNow - dueAfterPrepaid);
+  const drinkLines = (session.drinks||[]).map(l => `
+    <div class="drink-line"><span>${esc(l.name)} × ${l.qty}</span>
+      <span style="display:flex;align-items:center;gap:8px"><b class="num">${money(l.price*l.qty)} ج.م</b>
+      <button class="btn btn-ghost btn-sm" data-remove-drinkline="${l.drinkId}" data-session="${session.id}" style="padding:3px 8px">✕</button></span>
+    </div>`).join('');
+  const pastSegRows = segs.slice(0,-1).map(s=>`
+    <div class="kv-row"><span class="k">${esc(s.kind)} · ${esc(MODE_LABEL[s.mode]||s.mode)} (${s.minutes!=null?fmtDuration(s.minutes):''})</span>
+    <span class="v">${money(s.cost)} ج.م</span></div>`).join('');
+  return `<div class="modal-scrim" data-close-modal="1"><div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <h3 class="modal-title">${esc(device.name)}<small>${esc(sessionKind(session))} · ${esc(MODE_LABEL[session.mode]||'')} · ${isTime?'تايم':'أوبن'} · ${esc(session.customerName)}</small></h3>
+      <button class="modal-close" data-close-modal="1">✕</button>
+    </div>
+    <div class="kv-row"><span class="k">وقت البدء</span><span class="v">${fmtDateTime(session.startTime)}</span></div>
+    <div class="kv-row"><span class="k">${isTime?'الوقت المتبقي':'المدة الآن'}</span>
+      <span class="v num" id="modal-timer" data-start="${session.startTime}" data-billing="${session.billingType||'open'}" data-planned="${session.plannedMinutes||0}">${sessionTimerDisplay(session, mins)}</span></div>
+    ${isTime ? `<div class="kv-row"><span class="k">المبلغ المدفوع مقدمًا</span><span class="v">${money(session.prepaidAmount||0)} ج.م</span></div>` : ''}
+    <div class="kv-row"><span class="k">سعر الساعة الحالي</span><span class="v">${money(curSeg.rate)} ج.م/س</span></div>
+    ${pastSegRows ? `<div class="section-head" style="margin:14px 0 4px"><h3>فترات سابقة</h3></div>${pastSegRows}` : ''}
+    ${customer ? `<div class="kv-row"><span class="k">رصيد ${esc(customer.name)} الآن</span><span class="v num">${money(balanceNow)} ج.م</span></div>
+      <div class="kv-row"><span class="k">الرصيد بعد الخصم (تقديري)</span><span class="v num">${money(projectedBalance)} ج.م</span></div>` : ''}
+    <div class="section-head" style="margin:16px 0 6px"><h3>النمط الحالي</h3>
+      <button class="btn btn-ghost btn-sm" id="open-switch-picker">تغيير النمط</button></div>
+    ${state.switchPickerOpen ? renderSwitchPicker(device, session) : ''}
+    <div class="section-head" style="margin:16px 0 6px"><h3>المشروبات</h3>
+      <button class="btn btn-gold btn-sm" id="open-drink-picker">+ إضافة مشروب</button></div>
+    ${drinkLines || `<div class="empty-state" style="padding:14px">لا توجد مشروبات مضافة</div>`}
+    ${isAdmin() ? `<div class="field" style="margin-top:12px"><label>خصم قبل الإغلاق (ج.م) — المدير فقط</label>
+      <input class="rate-input num" id="close-discount" type="number" min="0" style="width:120px" value="${state.closeDiscount||0}"></div>` : ''}
+    <div class="total-strip"><span>الإجمالي حتى الآن</span><span class="amt num" id="modal-total">${money(total)} ج.م</span></div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      ${isAdmin() ? `<button class="btn btn-danger" id="cancel-session-btn" data-session="${session.id}" data-device="${device.id}">إلغاء</button>` : ''}
+      <button class="btn btn-grana" style="flex:1;min-width:150px" id="close-session-btn" data-session="${session.id}" data-device="${device.id}">إنهاء و الفاتورة</button>
+    </div>
+    ${state.drinkPickerOpen ? renderDrinkPicker(session.id) : ''}
+  </div></div>`;
+}
+function renderSwitchPicker(device, session){
+  const kind = state.switchKind || 'PS5';
+  const mode = state.switchMode || 'solo';
+  const customer = session.customerId ? state.customers.find(c=>c.id===session.customerId) : null;
+  return `<div class="form-card" style="margin-bottom:14px">
+    <p style="font-size:12px;color:var(--text-dim);margin:0 0 10px">هتتحفظ الفترة الحالية بسعرها، وتبدأ فترة جديدة</p>
+    <div class="mode-choice" style="grid-template-columns:repeat(2,1fr)">
+      ${KINDS.map(k=>`<div class="mode-chip ${kind===k?'sel':''}" data-pick-switch-kind="${k}"><span class="lbl">${k}</span></div>`).join('')}
+    </div>
+    <div class="mode-choice">
+      ${MODES.map(m=>{
+        const p = resolvePrices(customer, device, kind, m);
+        return `<div class="mode-chip ${mode===m?'sel':''}" data-pick-switch-mode="${m}">
+          <span class="lbl">${MODE_LABEL[m]}</span>
+          <span class="pr num">${money(p.hr)} ج.م/س</span>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="display:flex;gap:10px;margin-top:10px">
+      <button class="btn btn-ghost btn-sm" style="flex:1" id="close-switch-picker">إلغاء</button>
+      <button class="btn btn-primary btn-sm" style="flex:1" id="confirm-switch-btn" data-session="${session.id}">تأكيد التغيير</button>
+    </div>
+  </div>`;
+}
+function renderDrinkPicker(sessionId){
+  const items = state.drinks.map(d => {
+    const qty = state.drinkPickerQty[d.id] || 1;
+    return `<div class="drink-pick">
+      ${d.imageUrl?`<img src="${esc(d.imageUrl)}" onerror="this.style.display='none'">`:`<div class="row-avatar" style="width:38px;height:38px">🥤</div>`}
+      <div class="row-main"><div class="row-title">${esc(d.name)}</div><div class="row-sub">${money(d.price)} ج.م · متاح ${d.stock}</div></div>
+      <div class="qty-ctl"><button data-qty-dec="${d.id}">−</button><span class="num" style="min-width:18px;text-align:center">${qty}</span><button data-qty-inc="${d.id}">+</button></div>
+      <button class="btn btn-primary btn-sm" ${d.stock<1?'disabled':''} data-add-drink="${d.id}" data-session="${sessionId}">إضافة</button>
+    </div>`;
+  }).join('');
+  return `<div class="form-card" style="margin-top:14px">
+    <div class="section-head" style="margin:0 0 8px"><h3>اختر مشروبًا</h3>
+      <button class="btn btn-ghost btn-sm" id="close-drink-picker">إغلاق</button></div>
+    ${items || `<div class="empty-state">لا توجد مشروبات متاحة</div>`}
+  </div>`;
+}
+function renderExpenseModal(){
+  const opts = state.expenseCategories.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  return `<div class="modal-scrim" data-close-expense="1"><div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head"><h3 class="modal-title">تسجيل مصروف</h3>
+      <button class="modal-close" data-close-expense="1">✕</button></div>
+    ${state.expenseCategories.length ? `
+      <div class="field"><label>البند</label><select id="exp-cat">${opts}</select></div>
+      <div class="field"><label>المبلغ</label><input id="exp-amount" type="number" placeholder="0"></div>
+      <div class="field"><label>ملاحظة (اختياري)</label><input id="exp-note" placeholder="تفاصيل"></div>
+      <button class="btn btn-primary" id="save-expense-btn" style="width:100%">حفظ المصروف</button>
+    ` : `<div class="empty-state">لا توجد بنود مصروفات — أضفها المدير</div>`}
+  </div></div>`;
+}
+
+/* تعديل حساب موظف / تغيير باسوردي */
+function renderStaffEditModal(){
+  const isSelf = state.currentUser && state.staffEditId === state.currentUser.id;
+  const u = state.users.find(x=>x.id===state.staffEditId) || (isSelf ? state.currentUser : null);
+  if(!u) return '';
+  const adminEditing = isAdmin();
+  return `<div class="modal-scrim" data-close-staffedit="1"><div class="modal" style="max-width:400px" onclick="event.stopPropagation()">
+    <div class="modal-head"><h3 class="modal-title">${isSelf?'حسابي':'تعديل حساب موظف'}<small>${esc(u.name||u.username)}${(isSelf&&adminEditing)?' — بيتحفظ في كل الفروع':' — خاص بهذا الفرع فقط'}</small></h3>
+      <button class="modal-close" data-close-staffedit="1">✕</button></div>
+    ${adminEditing ? `
+      <div class="field"><label>اسم المستخدم</label><input id="se-username" value="${esc(u.username)}"></div>
+      <div class="field"><label>الاسم</label><input id="se-name" value="${esc(u.name||'')}"></div>
+      ${isSelf ? '' : `<div class="field"><label>الصلاحية</label><select id="se-role"><option value="staff" ${u.role!=='admin'?'selected':''}>موظف</option><option value="admin" ${u.role==='admin'?'selected':''}>مدير</option></select></div>`}
+    ` : ''}
+    <div class="field"><label>كلمة مرور جديدة</label><input id="se-password" type="password" placeholder="اتركه فارغًا للإبقاء على الحالية" autocomplete="new-password"></div>
+    ${isSelf && adminEditing ? `<p style="font-size:11px;color:var(--text-dim);margin:-6px 0 12px">تغيير باسوردك هنا بيتحفظ في كل الفروع.</p>` : ''}
+    <div style="display:flex;gap:10px;margin-top:6px">
+      <button class="btn btn-ghost" style="flex:1" data-close-staffedit="1">إلغاء</button>
+      <button class="btn btn-primary" style="flex:1" id="save-staffedit-btn">حفظ</button>
+    </div>
+  </div></div>`;
+}
+
+function buildPrintHtml(title, innerHtml){
+  return `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>${esc(title)}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:'Cairo',system-ui,sans-serif; padding:18px; direction:rtl; color:#111;}
+    .receipt{background:#fff; padding:14px; max-width:420px; margin:0 auto;}
+    .receipt-head{text-align:center;margin-bottom:14px;}
+    .receipt-head svg{width:64px;height:64px;margin:0 auto 6px;display:block;}
+    .receipt-head h2{margin:0;font-size:18px;}
+    .receipt-head p{margin:2px 0 0;font-size:11px;color:#555;}
+    hr{border:none;border-top:1px dashed #999;margin:10px 0;}
+    table{width:100%;border-collapse:collapse;font-size:12px;}
+    th,td{text-align:right;padding:5px 0;}
+    .r-row{display:flex;justify-content:space-between;font-size:12px;padding:2px 0;}
+    .num{font-family:'Oswald',sans-serif;}
+    @media print{body{padding:0;}}
+  </style></head><body>${innerHtml}
+  <script>setTimeout(function(){window.print();},400);<\/script>
+  </body></html>`;
+}
+function openPrintWindow(title, innerHtml){
+  const iframe = document.createElement('iframe');
+  iframe.style.position='fixed';
+  iframe.style.right='0'; iframe.style.bottom='0';
+  iframe.style.width='0'; iframe.style.height='0';
+  iframe.style.border='0';
+  iframe.setAttribute('aria-hidden','true');
+  document.body.appendChild(iframe);
+  try{
+    const doc = iframe.contentWindow.document;
+    doc.open(); doc.write(buildPrintHtml(title, innerHtml)); doc.close();
+  }catch(e){
+    console.error(e);
+    showNotice('تعذر فتح نافذة الطباعة');
+  }
+  setTimeout(()=>{ try{ iframe.remove(); }catch(e){} }, 5000);
+}
+
+function renderReceiptModal(s){
+  const mins = minutesBetween(s.startTime, s.endTime);
+  const segs = getSegments(s);
+  const drinkRows = (s.drinks||[]).map(l => `<tr><td>${esc(l.name)}</td><td class="num">${l.qty}</td><td class="num">${money(l.price)}</td><td class="num">${money(l.price*l.qty)}</td></tr>`).join('');
+  const segRows = segs.map(seg => `<div class="r-row"><span>فترة (${esc(seg.kind)} · ${esc(MODE_LABEL[seg.mode]||seg.mode)})</span><b>${seg.minutes!=null?fmtDuration(seg.minutes):'—'} — ${money(seg.cost||0)} ج.م</b></div>`).join('');
+  return `<div class="modal-scrim" data-close-receipt="1"><div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head"><h3 class="modal-title">الفاتورة<small>تم إغلاق الجلسة بنجاح</small></h3>
+      <button class="modal-close" data-close-receipt="1">✕</button></div>
+    <div id="receipt-content"><div class="receipt">
+      <div class="receipt-head">${renderLogo(64)}<h2>${esc(brandName())}</h2><p>فاتورة جلسة</p></div>
+      <hr>
+      <div class="r-row"><span>الجهاز</span><b>${esc(s.deviceName)} (${esc(sessionKind(s))} / ${esc(MODE_LABEL[s.mode]||'')})</b></div>
+      <div class="r-row"><span>نوع الجلسة</span><b>${s.billingType==='time'?'تايم':'أوبن'}</b></div>
+      ${s.billingType==='time' ? `<div class="r-row"><span>المبلغ المدفوع مقدمًا</span><b>${money(s.prepaidAmount||0)} ج.م</b></div>` : ''}
+      <div class="r-row"><span>العميل</span><b>${esc(s.customerName||'زائر')}</b></div>
+      <div class="r-row"><span>وقت البدء</span><b>${fmtDateTime(s.startTime)}</b></div>
+      <div class="r-row"><span>وقت الإغلاق</span><b>${fmtDateTime(s.endTime)}</b></div>
+      <div class="r-row"><span>مدة اللعب الإجمالية</span><b>${fmtDuration(mins)}</b></div>
+      <hr>
+      ${segs.length > 1 ? `<p style="font-weight:800;margin:4px 0">تفاصيل الفترات</p>${segRows}<hr>` : `<div class="r-row"><span>سعر الساعة</span><b>${money(s.rate)} ج.م</b></div><hr>`}
+      ${drinkRows ? `<table><thead><tr><th>مشروب</th><th>كمية</th><th>سعر</th><th>إجمالي</th></tr></thead><tbody>${drinkRows}</tbody></table><hr>` : ''}
+      <div class="r-row"><span>تكلفة الوقت</span><b>${money(s.timeCost)} ج.م</b></div>
+      <div class="r-row"><span>تكلفة المشروبات</span><b>${money(s.drinksCost)} ج.م</b></div>
+      ${s.discount ? `<div class="r-row" style="color:#555"><span>خصم</span><b>-${money(s.discount)} ج.م</b></div>` : ''}
+      <hr>
+      <div class="r-row" style="font-size:15px"><span>الإجمالي النهائي</span><b>${money(s.total)} ج.م</b></div>
+      ${s.billingType==='time' ? `<div class="r-row" style="color:#555"><span>المدفوع مقدمًا</span><b>-${money(s.prepaidAmount||0)} ج.م</b></div>` : ''}
+      ${s.customerId ? `<hr>
+        <div class="r-row"><span>مخصوم من رصيد ${esc(s.customerName||'')}</span><b>${money(s.balanceUsed||0)} ج.م</b></div>
+        <div class="r-row"><span>الرصيد المتبقي</span><b>${money(s.balanceAfter||0)} ج.م</b></div>` : ''}
+      <hr>
+      <div class="r-row" style="font-size:15px;color:#A50044;font-weight:800"><span>المطلوب نقدًا</span><b>${money(s.cashDue)} ج.م</b></div>
+    </div></div>
+    <div style="display:flex; gap:10px; margin-top:14px;">
+      <button class="btn btn-ghost" style="flex:1" data-close-receipt="1">إغلاق</button>
+      <button class="btn btn-primary" style="flex:1" id="print-receipt-btn">🖨️ طباعة</button>
+    </div>
+  </div></div>`;
+}
+function renderShiftReportModal(s){
+  const mins = minutesBetween(s.startTime, s.endTime);
+  const devRows = (s.deviceBreakdown||[]).map(d=>`<tr><td>${categoryLabel(d.category)} — ${esc(d.kind)} — ${esc(d.modeLabel)}</td><td class="num">${d.count}</td><td class="num">${money(d.revenue)}</td></tr>`).join('');
+  const drinkRows = (s.drinkBreakdown||[]).map(d=>`<tr><td>${esc(d.name)}</td><td class="num">${d.qty}</td><td class="num">${money(d.price)}</td><td class="num">${money(d.revenue)}</td></tr>`).join('');
+  const expRows = (s.expenseBreakdown||[]).map(e=>`<tr><td>${esc(e.category)}${e.note?` — ${esc(e.note)}`:''}</td><td class="num">${money(e.amount)}</td></tr>`).join('');
+  return `<div class="modal-scrim" data-close-report="1"><div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head"><h3 class="modal-title">تقرير الشفت<small>تم إغلاق الشفت</small></h3>
+      <button class="modal-close" data-close-report="1">✕</button></div>
+    <div id="receipt-content"><div class="receipt">
+      <div class="receipt-head">${renderLogo(64)}<h2>${esc(brandName())}</h2><p>تقرير شفت</p></div>
+      <hr>
+      <div class="r-row"><span>فتحه</span><b>${esc(s.openedByName)}</b></div>
+      <div class="r-row"><span>البداية</span><b>${fmtDateTime(s.startTime)}</b></div>
+      <div class="r-row"><span>الإغلاق</span><b>${fmtDateTime(s.endTime)}</b></div>
+      <div class="r-row"><span>مدة الشفت</span><b>${fmtDuration(mins)}</b></div>
+      <hr>
+      <p style="font-weight:800;margin:4px 0">الأجهزة</p>
+      <table><thead><tr><th>النوع/النمط</th><th>عدد</th><th>الإيراد</th></tr></thead><tbody>${devRows || `<tr><td colspan="3">—</td></tr>`}</tbody></table>
+      <hr>
+      <p style="font-weight:800;margin:4px 0">المشروبات (جلسات + بيع مباشر)</p>
+      <table><thead><tr><th>المشروب</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${drinkRows || `<tr><td colspan="4">—</td></tr>`}</tbody></table>
+      <hr>
+      <p style="font-weight:800;margin:4px 0">المصروفات</p>
+      <table><thead><tr><th>البند</th><th>المبلغ</th></tr></thead><tbody>${expRows || `<tr><td colspan="2">—</td></tr>`}</tbody></table>
+      <hr>
+      <div class="r-row"><span>إجمالي إيراد الأجهزة</span><b>${money(s.deviceRevenue)} ج.م</b></div>
+      <div class="r-row"><span>إجمالي إيراد المشروبات</span><b>${money(s.drinksRevenue)} ج.م</b></div>
+      <div class="r-row"><span>إجمالي المصروفات</span><b>-${money(s.expensesTotal)} ج.م</b></div>
+      <hr>
+      <div class="r-row" style="font-size:16px"><span>الصافي النهائي</span><b>${money(s.netTotal)} ج.م</b></div>
+    </div></div>
+    <div style="display:flex; gap:10px; margin-top:14px;">
+      <button class="btn btn-ghost" style="flex:1" data-close-report="1">إغلاق</button>
+      <button class="btn btn-primary" style="flex:1" id="print-report-btn">🖨️ طباعة</button>
+    </div>
+  </div></div>`;
+}
+
+/* ---------- Event wiring ---------- */
+function attachShellEvents(){
+  attachSettingsEvents();
+  document.getElementById('burger-btn')?.addEventListener('click', ()=>{ state.sidebarOpen = true; render(); });
+  document.getElementById('scrim')?.addEventListener('click', ()=>{ state.sidebarOpen = false; render(); });
+  document.getElementById('logout-btn')?.addEventListener('click', doLogout);
+  document.getElementById('switch-branch-btn')?.addEventListener('click', leaveShop);
+  document.getElementById('change-pw-btn')?.addEventListener('click', ()=>{
+    if(!state.currentUser) return;
+    state.staffEditId = state.currentUser.id;
+    render();
+  });
+  document.querySelectorAll('[data-nav]').forEach(el=> el.addEventListener('click', ()=>{ state.view = el.getAttribute('data-nav'); state.sidebarOpen=false; render(); }));
+  document.querySelectorAll('[data-htab]').forEach(el=> el.addEventListener('click', ()=>{ state.historyTab = el.getAttribute('data-htab'); render(); }));
+
+  // فلترة السجل بالتاريخ + تصدير
+  document.getElementById('hist-from')?.addEventListener('change', (e)=>{ state.historyFrom = e.target.value; render(); });
+  document.getElementById('hist-to')?.addEventListener('change', (e)=>{ state.historyTo = e.target.value; render(); });
+  document.getElementById('hist-clear')?.addEventListener('click', ()=>{ state.historyFrom=''; state.historyTo=''; render(); });
+  document.getElementById('hist-export')?.addEventListener('click', exportHistoryCsv);
+
+  document.getElementById('start-shift-btn')?.addEventListener('click', startShift);
+  document.getElementById('end-shift-btn')?.addEventListener('click', endShift);
+  document.getElementById('open-expense-modal')?.addEventListener('click', ()=>{ state.expenseModalOpen = true; render(); });
+  document.querySelectorAll('[data-close-expense]').forEach(el=> el.addEventListener('click', ()=>{ state.expenseModalOpen=false; render(); }));
+  document.getElementById('save-expense-btn')?.addEventListener('click', ()=> addExpense(val('exp-cat'), val('exp-amount'), val('exp-note')));
+  document.querySelectorAll('[data-del-expense]').forEach(el=> el.addEventListener('click', ()=> deleteExpense(el.getAttribute('data-del-expense'))));
+
+  // حذف/تصحيح البيع المباشر (إرجاع المخزون)
+  document.querySelectorAll('[data-del-sale]').forEach(el=> el.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    deleteDrinkSale(el.getAttribute('data-del-sale'));
+  }));
+
+  // بيع مباشر
+  document.querySelectorAll('[data-sell-drink]').forEach(el=> el.addEventListener('click', ()=> openSellModal(el.getAttribute('data-sell-drink'))));
+  document.querySelectorAll('[data-close-sell]').forEach(el=> el.addEventListener('click', closeSellModal));
+  document.querySelector('[data-sell-inc]')?.addEventListener('click', ()=>{
+    const drink = state.drinks.find(d => d.id === state.sellModal);
+    const max = drink ? (Number(drink.stock)||0) : 999;
+    state.sellQty = Math.min(max, (state.sellQty||1) + 1);
+    render();
+  });
+  document.querySelector('[data-sell-dec]')?.addEventListener('click', ()=>{
+    state.sellQty = Math.max(1, (state.sellQty||1) - 1);
+    render();
+  });
+  document.getElementById('confirm-sell-btn')?.addEventListener('click', ()=>{
+    if(state.sellModal) sellDrink(state.sellModal, state.sellQty||1);
+  });
+  document.querySelectorAll('[data-close-sale-receipt]').forEach(el=> el.addEventListener('click', ()=>{ state.saleReceipt = null; render(); }));
+  document.getElementById('print-sale-receipt-btn')?.addEventListener('click', ()=>{
+    const el = document.getElementById('sale-receipt-content');
+    if(el) openPrintWindow('فاتورة بيع', el.innerHTML);
+  });
+
+  document.querySelectorAll('[data-open-station]').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      if(e.target.closest('[data-quick-start]')) return;
+      state.openDeviceId = el.getAttribute('data-open-station');
+      state.drinkPickerOpen=false; state.switchPickerOpen=false;
+      state.startKind='PS5'; state.startMode='solo'; state.startBillingType='open'; state.startPrepaidAmount=0;
+      state.startCustomerId=''; state.closeDiscount = 0;
+      state.drinkPickerQty = {};
+      render();
+    });
+  });
+  document.querySelectorAll('[data-quick-start]').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      e.stopPropagation(); if(el.disabled) return;
+      state.openDeviceId = el.getAttribute('data-quick-start');
+      state.startKind='PS5'; state.startMode='solo'; state.startBillingType='open'; state.startPrepaidAmount=0;
+      state.startCustomerId=''; state.closeDiscount = 0;
+      state.drinkPickerQty = {};
+      render();
+    });
+  });
+  document.querySelectorAll('[data-station-count]').forEach(el=> el.addEventListener('click', ()=> adjustStationCount(el.getAttribute('data-category'), Number(el.getAttribute('data-station-count')))));
+  document.querySelectorAll('[data-sprice]').forEach(el=> el.addEventListener('change', ()=> updateStationPrice(
+    el.getAttribute('data-sprice'), el.getAttribute('data-kind'), el.getAttribute('data-mode'), el.getAttribute('data-field'), el.value
+  )));
+  document.querySelectorAll('[data-del-station]').forEach(el=> el.addEventListener('click', ()=> deleteStation(el.getAttribute('data-del-station'))));
+
+  document.querySelectorAll('[data-close-modal]').forEach(el=> el.addEventListener('click', ()=>{
+    state.openDeviceId=null; state.drinkPickerOpen=false; state.switchPickerOpen=false;
+    state.startCustomerId=''; state.closeDiscount=0;
+    render();
+  }));
+  document.querySelectorAll('[data-close-receipt]').forEach(el=> el.addEventListener('click', ()=>{ state.receiptSession=null; render(); }));
+  document.querySelectorAll('[data-close-report]').forEach(el=> el.addEventListener('click', ()=>{ state.reportShift=null; render(); }));
+  document.getElementById('print-receipt-btn')?.addEventListener('click', ()=>{
+    const el = document.getElementById('receipt-content');
+    if(el) openPrintWindow('فاتورة جلسة', el.innerHTML);
+  });
+  document.getElementById('print-report-btn')?.addEventListener('click', ()=>{
+    const el = document.getElementById('receipt-content');
+    if(el) openPrintWindow('تقرير شفت', el.innerHTML);
+  });
+
+  document.querySelectorAll('[data-pick-kind]').forEach(el=> el.addEventListener('click', ()=>{ state.startKind = el.getAttribute('data-pick-kind'); render(); }));
+  document.querySelectorAll('[data-pick-mode]').forEach(el=> el.addEventListener('click', ()=>{ state.startMode = el.getAttribute('data-pick-mode'); render(); }));
+  document.querySelectorAll('[data-pick-billing]').forEach(el=> el.addEventListener('click', ()=>{ state.startBillingType = el.getAttribute('data-pick-billing'); render(); }));
+  document.querySelectorAll('[data-pick-amount]').forEach(el=> el.addEventListener('click', ()=>{ state.startPrepaidAmount = Number(el.getAttribute('data-pick-amount')); render(); }));
+  document.getElementById('start-customer')?.addEventListener('change', (e)=>{ state.startCustomerId = e.target.value; render(); });
+  document.getElementById('confirm-start-btn')?.addEventListener('click', ()=>{
+    startSession(state.openDeviceId, state.startCustomerId || null, state.startKind, state.startMode, state.startBillingType, state.startPrepaidAmount);
+  });
+
+  // خصم الإغلاق
+  document.getElementById('close-discount')?.addEventListener('input', (e)=>{
+    state.closeDiscount = Number(e.target.value)||0;
+  });
+
+  document.getElementById('open-drink-picker')?.addEventListener('click', ()=>{ state.drinkPickerOpen=true; render(); });
+  document.getElementById('close-drink-picker')?.addEventListener('click', ()=>{ state.drinkPickerOpen=false; render(); });
+  document.getElementById('open-switch-picker')?.addEventListener('click', (e)=>{
+    if(e.target.disabled) return;
+    const session = state.sessions.find(s=>s.id===state.devices.find(d=>d.id===state.openDeviceId)?.sessionId);
+    state.switchKind = sessionKind(session) || 'PS5';
+    state.switchMode = session?.mode || 'solo';
+    state.switchPickerOpen = true; render();
+  });
+  document.getElementById('close-switch-picker')?.addEventListener('click', ()=>{ state.switchPickerOpen=false; render(); });
+  document.querySelectorAll('[data-pick-switch-kind]').forEach(el=> el.addEventListener('click', ()=>{ state.switchKind = el.getAttribute('data-pick-switch-kind'); render(); }));
+  document.querySelectorAll('[data-pick-switch-mode]').forEach(el=> el.addEventListener('click', ()=>{ state.switchMode = el.getAttribute('data-pick-switch-mode'); render(); }));
+  document.getElementById('confirm-switch-btn')?.addEventListener('click', (e)=> switchSessionRate(e.target.getAttribute('data-session'), state.switchKind, state.switchMode));
+  document.querySelectorAll('[data-qty-inc]').forEach(el=> el.addEventListener('click', ()=>{ const id=el.getAttribute('data-qty-inc'); state.drinkPickerQty[id]=(state.drinkPickerQty[id]||1)+1; render(); }));
+  document.querySelectorAll('[data-qty-dec]').forEach(el=> el.addEventListener('click', ()=>{ const id=el.getAttribute('data-qty-dec'); state.drinkPickerQty[id]=Math.max(1,(state.drinkPickerQty[id]||1)-1); render(); }));
+  document.querySelectorAll('[data-add-drink]').forEach(el=> el.addEventListener('click', ()=>{
+    const id = el.getAttribute('data-add-drink');
+    const sessionId = el.getAttribute('data-session');
+    addDrinkToSession(sessionId, id, state.drinkPickerQty[id]||1);
+  }));
+  document.querySelectorAll('[data-remove-drinkline]').forEach(el=> el.addEventListener('click', ()=> removeDrinkLine(el.getAttribute('data-session'), el.getAttribute('data-remove-drinkline'))));
+  document.getElementById('close-session-btn')?.addEventListener('click', (e)=> closeSession(e.target.getAttribute('data-session'), e.target.getAttribute('data-device')));
+  document.getElementById('cancel-session-btn')?.addEventListener('click', (e)=> cancelSession(e.target.getAttribute('data-session'), e.target.getAttribute('data-device')));
+
+  document.getElementById('save-customer-btn')?.addEventListener('click', ()=> addCustomer(val('nc-name'), val('nc-phone'), val('nc-dob'), val('nc-balance'), val('nc-rate'), document.getElementById('nc-use-custom')?.checked));
+  document.querySelectorAll('[data-rate-for]').forEach(el=> el.addEventListener('change', ()=> updateCustomerRate(el.getAttribute('data-rate-for'), el.value)));
+  document.querySelectorAll('[data-rate-toggle]').forEach(el=> el.addEventListener('change', ()=> updateCustomerRateToggle(el.getAttribute('data-rate-toggle'), el.checked)));
+  document.querySelectorAll('[data-balance-for]').forEach(el=> el.addEventListener('change', ()=> updateCustomerBalance(el.getAttribute('data-balance-for'), el.value)));
+  document.querySelectorAll('[data-edit-customer]').forEach(el=> el.addEventListener('click', ()=> editCustomerInfo(el.getAttribute('data-edit-customer'))));
+  document.querySelectorAll('[data-del-customer]').forEach(el=> el.addEventListener('click', ()=> deleteCustomer(el.getAttribute('data-del-customer'))));
+
+  document.getElementById('save-drink-btn')?.addEventListener('click', ()=> addDrink(val('ndr-name'), val('ndr-price'), val('ndr-stock'), val('ndr-image')));
+  document.querySelectorAll('[data-del-drink]').forEach(el=> el.addEventListener('click', ()=> deleteDrink(el.getAttribute('data-del-drink'))));
+  document.querySelectorAll('[data-edit-drink]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const d = state.drinks.find(x=>x.id===el.getAttribute('data-edit-drink')); if(!d) return;
+      askInput('تعديل ' + d.name, [
+        {key:'price', label:'السعر', value:d.price, type:'number'},
+        {key:'stock', label:'الكمية بالمخزون', value:d.stock, type:'number'},
+      ], 'edit-drink', {id:d.id});
+    });
+  });
+
+  document.getElementById('save-expcat-btn')?.addEventListener('click', ()=> addExpenseCategory(val('nexp-name')));
+  document.querySelectorAll('[data-del-expcat]').forEach(el=> el.addEventListener('click', ()=> deleteExpenseCategory(el.getAttribute('data-del-expcat'))));
+
+  document.getElementById('save-staff-btn')?.addEventListener('click', ()=> addStaff(val('ns-username'), val('ns-password'), val('ns-name'), val('ns-role')));
+  document.querySelectorAll('[data-del-staff]').forEach(el=> el.addEventListener('click', ()=> deleteStaff(el.getAttribute('data-del-staff'))));
+  document.querySelectorAll('[data-edit-staff]').forEach(el=> el.addEventListener('click', ()=> openStaffEdit(el.getAttribute('data-edit-staff'))));
+  document.querySelectorAll('[data-close-staffedit]').forEach(el=> el.addEventListener('click', closeStaffEdit));
+  document.getElementById('save-staffedit-btn')?.addEventListener('click', saveStaffEdit);
+
+  document.querySelectorAll('[data-view-receipt]').forEach(el=> el.addEventListener('click', ()=>{
+    const s = state.sessions.find(x=>x.id===el.getAttribute('data-view-receipt'));
+    if(s){ state.receiptSession=s; render(); }
+  }));
+  document.querySelectorAll('[data-view-shift]').forEach(el=> el.addEventListener('click', ()=>{
+    const s = state.shifts.find(x=>x.id===el.getAttribute('data-view-shift'));
+    if(s){ state.reportShift=s; render(); }
+  }));
+  document.getElementById('load-older-btn')?.addEventListener('click', loadOlderSessions);
+}
+function val(id){ return document.getElementById(id)?.value || ''; }
+
+function updateLiveTimers(){
+  document.querySelectorAll('[id^="timer-"]').forEach(el=>{
+    const deviceId = el.id.replace('timer-','');
+    const session = activeSessionFor(deviceId);
+    if(!session) return;
+    const mins = minutesBetween(session.startTime, nowIso());
+    const planned = Number(session.plannedMinutes)||0;
+    const overtime = session.billingType==='time' && planned>0 && mins>planned;
+    el.textContent = sessionTimerDisplay(session, mins);
+    el.style.color = overtime ? 'var(--danger)' : '';
+    const costEl = document.getElementById('cost-'+deviceId);
+    if(costEl){
+      const live = computeSessionTimeCost(session, nowIso()) + (session.drinksCost||0);
+      costEl.textContent = money(live)+' ج.م';
+    }
+  });
+  const modalTimer = document.getElementById('modal-timer');
+  if(modalTimer){
+    const session = state.sessions.find(s=>s.id===activeSessionFor(state.openDeviceId)?.id);
+    if(session){
+      const mins = minutesBetween(session.startTime, nowIso());
+      const planned = Number(session.plannedMinutes)||0;
+      const overtime = session.billingType==='time' && planned>0 && mins>planned;
+      modalTimer.textContent = sessionTimerDisplay(session, mins);
+      modalTimer.style.color = overtime ? 'var(--danger)' : '';
+      const timeCost = computeSessionTimeCost(session, nowIso());
+      const drinksCost = (session.drinks||[]).reduce((a,x)=>a+x.qty*x.price,0);
+      const discount = isAdmin() ? Math.min(Math.max(0, Number(state.closeDiscount)||0), timeCost + drinksCost) : 0;
+      const live = Math.max(0, timeCost + drinksCost - discount);
+      const total = document.getElementById('modal-total'); if(total) total.textContent = money(live)+' ج.م';
+    }
+  }
+  const shiftTimer = document.getElementById('shift-timer');
+  if(shiftTimer){ shiftTimer.textContent = fmtDuration(minutesBetween(shiftTimer.getAttribute('data-start'), nowIso())); }
+}
+
+/* ============================================================
+   SUPABASE SETUP — نفّذ الكود ده في SQL Editor بمشروعك على
+   supabase.com قبل ما تشغّل التطبيق، وحطّ SUPABASE_URL و
+   SUPABASE_ANON_KEY الحقيقيين بتوعك فوق (دوّر على 'YOUR-PROJECT').
+
+   create table if not exists documents (
+     collection_path text not null,
+     id text not null,
+     data jsonb not null default '{}'::jsonb,
+     updated_at timestamptz not null default now(),
+     primary key (collection_path, id)
+   );
+   create index if not exists documents_collection_idx
+     on documents(collection_path);
+
+   alter table documents enable row level security;
+   -- التطبيق ده عنده نظام يوزر/باسورد خاص بيه (مش Supabase Auth)،
+   -- يعني كل زوار الصفحة بيستخدموا نفس الـ anon key العام.
+   -- السطرين دول بيفتحوا الجدول بالكامل لأي حد عنده الـ anon key
+   -- (المفتاح ده هيبقى ظاهر جوه ملف الـ HTML/APK نفسه).
+   -- ده بالظبط نفس مستوى الحماية اللي كان موجود قبل كده، لكن
+   -- خليك واعي إنه بقى Public على الإنترنت مش مقفول على مؤسستك بس.
+   create policy "public read" on documents for select using (true);
+   create policy "public write" on documents for all using (true) with check (true);
+
+   -- تفعيل الـ Realtime عشان onSnapshot يشتغل (تحديث لحظي بين الشاشات):
+   alter publication supabase_realtime add table documents;
+   ============================================================ */
+
+/* ---------- Go ---------- */
+render();
+boot();
+
+/* ============================================================
+   ملاحظات على نظام الحماية (v7 — Supabase)
+   ------------------------------------------------------------
+   الحماية دلوقتي بتعتمد بالكامل على SUPABASE_ANON_KEY: أي حد
+   يشوف الكود (أو يفك الـ APK) هيشوف المفتاح ده ويقدر يتكلم مع
+   قاعدة البيانات مباشرة من برا التطبيق تمامًا، من غير ما يعدي
+   على أي شاشة تسجيل دخول. نظام اليوزر/باسورد الداخلي فايدته
+   الأساسية تتبّع مين شغّال شفت إمتى، مش حماية حقيقية للبيانات.
+
+   لو محتاج حماية فعلية، الخطوة الصح هي تفعيل Supabase Auth
+   (بريد/باسورد أو Magic Link) وربط RLS بـ auth.uid() بدل
+   "using (true)" — ده هيحتاج إعادة تصميم شاشة تسجيل الدخول
+   عشان تستخدم supabase.auth بدل نظام users/credentials الحالي.
+   قوللي لو عايز تبدأ في الخطوة دي.
+   ============================================================ */
+</script>
+</body>
+</html>
